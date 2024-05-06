@@ -14,6 +14,9 @@ class LoginPage extends StatelessWidget {
       ),
     );
   }
+
+  //
+
 }
 
 class LoginView extends StatefulWidget {
@@ -23,6 +26,38 @@ class LoginView extends StatefulWidget {
 }
 
 class LoginLayout extends State<LoginView> {
+
+  bool _passwordVisible = false;
+
+  void openDialog(BuildContext context) {
+
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Test Modal'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                // Text('Base url'),
+                //
+              ],
+            )
+          ],
+        ),
+        actions: <Widget>[
+          TextButton(
+            //child: const Text('OK'),
+            child: Text('Save'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,8 +72,17 @@ class LoginLayout extends State<LoginView> {
                 color: Colors.white,
                 child: Column(
                   children: <Widget>[
+                    Padding(padding: EdgeInsets.all(20.0), child: Image.asset('assets/icons/logo.png')),
+                    // const Padding(padding: EdgeInsets.all(20.0), child: Text(
+                    //   'Login', // Your title text
+                    //   style: TextStyle(
+                    //     fontSize: 24.0, // Adjust font size as needed
+                    //     fontWeight: FontWeight.bold, // Make text bold (optional)
+                    //     color: Colors.green, // Set color to green
+                    //   ),
+                    // ),),
                     Padding(padding: EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Email',fillColor: Colors.white),),),
-                    Padding(padding: EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Password',fillColor: Colors.white),),),
+                    Padding(padding: EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Password',fillColor: Colors.white), obscureText: true,),),
                     Padding(padding: EdgeInsets.all(20.0), child: ConstrainedBox(
                       constraints: BoxConstraints.tightFor(width: double.infinity),
                       child: ElevatedButton(
@@ -49,6 +93,11 @@ class LoginLayout extends State<LoginView> {
                       ),
                     ),
                     ),
+                    Padding(padding: EdgeInsets.all(20.0), child: Row(
+                      children: [
+                        TextButton(onPressed: null, child: Text('Forget Password'))
+                      ],
+                    )),
                   ],
                 ),
               )
@@ -56,7 +105,11 @@ class LoginLayout extends State<LoginView> {
           ),
         ),
       ),
+      floatingActionButton:  FloatingActionButton(child: Icon(Icons.settings,color: Colors.green,),onPressed:() =>  openDialog(context),mini: true,backgroundColor: Colors.white,enableFeedback: true),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop
     );
   }
 
+
 }
+
