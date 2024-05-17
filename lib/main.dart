@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'dart:developer';
 import 'login_page.dart';
 import 'package:flutter/services.dart';
 
@@ -9,7 +8,6 @@ Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Color.fromRGBO(234, 234, 234, 0.0),
   ));
-  log('babi');
   runApp(const LoginPage());
 }
 
@@ -124,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             ElevatedButton(
               onPressed: _incrementCounter,
-              child: Text('Go to Second View'),
+              child: const Text('Go to Second View'),
             ),
           ],
         ),

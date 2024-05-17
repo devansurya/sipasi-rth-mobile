@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'admin/dashboard.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'data.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -7,16 +12,13 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: LoginView(),
+      home: const LoginView(),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
     );
   }
-
-  //
-
 }
 
 class LoginView extends StatefulWidget {
@@ -27,30 +29,28 @@ class LoginView extends StatefulWidget {
 
 class LoginLayout extends State<LoginView> {
 
-  bool _passwordVisible = false;
+  final bool _passwordVisible = false;
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passController = TextEditingController();
 
   void openDialog(BuildContext context) {
 
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Test Modal'),
+        title: const Text('Setting'),
         content: const Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             Row(
               mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                // Text('Base url'),
-                //
-              ],
             )
           ],
         ),
         actions: <Widget>[
           TextButton(
             //child: const Text('OK'),
-            child: Text('Save'),
+            child: const Text('Save'),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -58,12 +58,40 @@ class LoginLayout extends State<LoginView> {
     );
   }
 
+  void checkLogin(BuildContext context) async {
+    try {
+      if (emailController.text.isEmpty || passController.text.isEmpty) {
+        Fluttertoast.showToast(
+          msg: 'Email and password must not be empty.',
+          backgroundColor: Colors.grey,
+        );
+        return;
+      }
+      final data = DataFetch();
+      final response = await data.getToken(email: emailController.text, pass: passController.text);
+      log(jsonEncode(response));
+      if (response != null && response['code'] == 200) {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
+      } else {
+        Fluttertoast.showToast(
+          msg: 'Login failed. Please check your credentials.',
+          backgroundColor: Colors.grey,
+        );
+      }
+    } catch (error) {
+      Fluttertoast.showToast(
+        msg: error.toString().replaceAll('Exception: ', ''),
+        backgroundColor: Colors.grey,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(234, 234, 234, 1.0),
+      backgroundColor: const Color.fromRGBO(234, 234, 234, 1.0),
       body: Padding(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -72,28 +100,20 @@ class LoginLayout extends State<LoginView> {
                 color: Colors.white,
                 child: Column(
                   children: <Widget>[
-                    Padding(padding: EdgeInsets.all(20.0), child: Image.asset('assets/icons/logo.png')),
-                    // const Padding(padding: EdgeInsets.all(20.0), child: Text(
-                    //   'Login', // Your title text
-                    //   style: TextStyle(
-                    //     fontSize: 24.0, // Adjust font size as needed
-                    //     fontWeight: FontWeight.bold, // Make text bold (optional)
-                    //     color: Colors.green, // Set color to green
-                    //   ),
-                    // ),),
-                    Padding(padding: EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Email',fillColor: Colors.white),),),
-                    Padding(padding: EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Password',fillColor: Colors.white), obscureText: true,),),
-                    Padding(padding: EdgeInsets.all(20.0), child: ConstrainedBox(
-                      constraints: BoxConstraints.tightFor(width: double.infinity),
+                    Padding(padding: const EdgeInsets.all(20.0), child: Image.asset('assets/icons/logo.png')),
+                    Padding(padding: const EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Email',fillColor: Colors.white),controller: emailController,),),
+                    Padding(padding: const EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Password',fillColor: Colors.white), obscureText: true,controller: passController,),),
+                    Padding(padding: const EdgeInsets.all(20.0), child: ConstrainedBox(
+                      constraints: const BoxConstraints.tightFor(width: double.infinity),
                       child: ElevatedButton(
                         onPressed: () {
-                          // Your button action
+                          checkLogin(context);
                         },
-                        child: Text('Login'),
+                        child: const Text('Login'),
                       ),
                     ),
                     ),
-                    Padding(padding: EdgeInsets.all(20.0), child: Row(
+                    const Padding(padding: EdgeInsets.all(20.0), child: Row(
                       children: [
                         TextButton(onPressed: null, child: Text('Forget Password'))
                       ],
@@ -105,7 +125,7 @@ class LoginLayout extends State<LoginView> {
           ),
         ),
       ),
-      floatingActionButton:  FloatingActionButton(child: Icon(Icons.settings,color: Colors.green,),onPressed:() =>  openDialog(context),mini: true,backgroundColor: Colors.white,enableFeedback: true),
+      floatingActionButton:  FloatingActionButton(onPressed:() =>  openDialog(context),mini: true,backgroundColor: Colors.white,enableFeedback: true, child: const Icon(Icons.settings,color: Colors.green,)),
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop
     );
   }
