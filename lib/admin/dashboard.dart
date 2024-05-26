@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../api/data.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -8,52 +11,92 @@ class Dashboard extends StatefulWidget {
 }
 
 class DashboardView extends State<Dashboard> {
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       body: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: getDataTable(data: [
-          {'Name': 'ujang','kecamatan': 'tapos','kelurahan': 'tapos'}
-        ]),
+        padding: EdgeInsets.all(16.0),
+        child: GetCard(),
       ),
     );
   }
 }
 
-class getDataTable extends StatelessWidget {
-  final List<Map> data;
+class GetCard extends StatelessWidget {
+  // final List<Map> data;
 
-  const getDataTable({super.key, required this.data});
+  final data = DataFetch();
 
-  List<DataRow> getTableRows(List<Map> data) {
-    List<DataRow> rows = [];
+  List<Widget> getCard(List<Map> data) {
+    List<Column> rows = [];
+    print(data);
+    log('babyyy');
     data.forEach((element) {
-      // Create a TableRow for each data item
-      List<DataCell> cells = []; // List to hold cell widgets
-      element.forEach((key, value) {
-        cells.add(DataCell(Text(value))); // Add Text widget for each data value
-      });
-      cells.add(DataCell(Row(children: [
-        ButtonBar(
-          children: [FaIcon(FontAwesomeIcons.pencil)],
+      print(element);
+      Card card = Card(
+        elevation: 4.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
         ),
-        ButtonBar(
-          children: [FaIcon(FontAwesomeIcons.trash)],
-        )
-      ])));
-      rows.add(DataRow(cells: cells));
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(10.0)),
+              child: Image.asset(
+                "assets/images/default-card.jpg",
+                fit: BoxFit.cover,
+                height: 150,
+                width: double.infinity,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                element['nama_rth'],
+                style: const TextStyle(fontSize: 16.0),
+              ),
+            )
+          ],
+        ),
+      );
+
+      Column column = Column(
+        children: [
+          Padding(padding: const EdgeInsets.all(0.0),child: card),
+
+        ],
+      );
+
+      rows.add(column);
     });
     return rows;
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(scrollDirection: Axis.horizontal,child: DataTable(columns: const <DataColumn>[
-      DataColumn(label: Text('Name')),
-      DataColumn(label: Text('Kecamatan')),
-      DataColumn(label: Text('Kelurahan')),
-      DataColumn(label: Text('Action')),
-    ], rows: getTableRows(data)),);
+    return FutureBuilder(
+        future: data.getRthData(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return Center(child: Text('No data available'));
+          }
+          else {
+            // print(snapshot.data['data']);
+            final result = snapshot.data['data'];
+            final parsedData = new List<Map<dynamic, dynamic>>.from(result);
+            print(parsedData);
+            // return getCard(result);
+            return ListView(children: getCard(parsedData));
+          }
+
+        },
+    );
+
   }
 }

@@ -4,22 +4,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'admin/dashboard.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'data.dart';
+import 'api/data.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: const LoginView(),
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
-      ),
-    );
-  }
-}
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -68,7 +54,7 @@ class LoginLayout extends State<LoginView> {
         return;
       }
       final data = DataFetch();
-      final response = await data.getToken(email: emailController.text, pass: passController.text);
+      final response = await data.login(email: emailController.text, pass: passController.text);
       log(jsonEncode(response));
       if (response != null && response['code'] == 200) {
         Navigator.push(context, MaterialPageRoute(builder: (context) => Dashboard()));
@@ -129,7 +115,5 @@ class LoginLayout extends State<LoginView> {
       floatingActionButtonLocation: FloatingActionButtonLocation.endTop
     );
   }
-
-
 }
 
