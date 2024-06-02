@@ -20,10 +20,15 @@ class DB {
       join(databasePath, databaseName),
       onCreate: (db, version) {
         return db.execute(
-          "CREATE TABLE Setting(code TEXT PRIMARY KEY, desc TEXT, value TEXT)",
+          "CREATE TABLE Setting(code TEXT PRIMARY KEY, desc TEXT, value TEXT, createDate DATETIME)",
         );
       },
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < newVersion) {
+          db.execute("ALTER TABLE Setting ADD COLUMN createDate DATETIME");
+        }
+      },
+      version: 3,
     );
   }
 
@@ -63,6 +68,32 @@ class DB {
     catch(e){
       print(e);
     }
+  }
+
+  Future<Map<String?, Object?>> getFullSetting(String code) async {
+    //default value
+    Map<String?, Object?> value = {
+      'code': null,
+      'desc': null,
+      'value': null,
+      'createDate' : null
+    };
+
+    try{
+      final db = await database;
+      log('get setting $code');
+      final List<Map<String?, Object?>> SettingMap = await db.query(
+          'Setting',
+          where: 'code = ?',
+          whereArgs: [code],
+          limit: 1
+      );
+      value = SettingMap[0];
+    }
+    catch(e){
+      print(e);
+    }
+    return value;
   }
 
   Future<bool> deleteSetting(String code) async {

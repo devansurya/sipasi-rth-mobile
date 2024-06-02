@@ -1,33 +1,12 @@
+import '../../api/data.dart';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../api/data.dart';
-
-class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
-  @override
-  State<StatefulWidget> createState() => DashboardView();
-}
-
-class DashboardView extends State<Dashboard> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: GetCard(),
-      ),
-    );
-  }
-}
 
 class GetCard extends StatelessWidget {
   // final List<Map> data;
 
   final data = DataFetch();
-
   List<Widget> getCard(List<Map> data) {
     List<Column> rows = [];
     print(data);
@@ -65,7 +44,6 @@ class GetCard extends StatelessWidget {
       Column column = Column(
         children: [
           Padding(padding: const EdgeInsets.all(0.0),child: card),
-
         ],
       );
 
@@ -77,25 +55,24 @@ class GetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: data.getRthData(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No data available'));
-          }
-          else {
-            // print(snapshot.data['data']);
-            final result = snapshot.data['data'];
-            final parsedData = new List<Map<dynamic, dynamic>>.from(result);
-            print(parsedData);
-            // return getCard(result);
-            return ListView(children: getCard(parsedData));
-          }
-
-        },
+      future: data.getRthData(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No data available'));
+        }
+        else {
+          // print(snapshot.data['data']);
+          final result = snapshot.data['data'];
+          final parsedData = new List<Map<dynamic, dynamic>>.from(result);
+          print(parsedData);
+          // return getCard(result);
+          return ListView(children: getCard(parsedData));
+        }
+      },
     );
 
   }

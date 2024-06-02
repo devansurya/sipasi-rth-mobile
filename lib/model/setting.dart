@@ -2,11 +2,13 @@ class Setting {
   final String code;
   final String desc;
   final String value;
+  final String createDate;
 
   const Setting({
     required this.code,
     required this.desc,
     required this.value,
+    required this.createDate,
   });
   String getCode() {
     return code;
@@ -17,6 +19,7 @@ class Setting {
       'code': code,
       'desc': desc,
       'value': value,
+      'createDate': createDate,
     };
   }
 
@@ -24,10 +27,11 @@ class Setting {
     code: map['code'],
     desc: map['desc'],
     value: map['value'],
+    createDate: map['createDate'],
   );
 
   @override
   String toString() {
-    return 'Setting{code: $code, desc: $desc, age: $value}';
+    return 'Setting{code: $code, desc: $desc, value: $value, createDate:$createDate}';
   }
 }
