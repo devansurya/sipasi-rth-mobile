@@ -13,7 +13,7 @@ class DashboardView extends State<Rth> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 16.0),
         child: GetCard(),
       )
     );

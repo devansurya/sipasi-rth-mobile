@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../api/data.dart';
+import 'dart:developer';
 
 class ImageApi extends StatelessWidget {
   final String Url;
@@ -24,6 +25,7 @@ class ImageApi extends StatelessWidget {
     final baseUrl = await DataFetch.getAssetsUrl();
 
     final newUrl =  (useBaseUrl) ? baseUrl+Url : Url ;
+
     final response = await http.get(Uri.parse(newUrl));
 
     if (response.statusCode == 200) {
@@ -44,12 +46,18 @@ class ImageApi extends StatelessWidget {
       final bool isValid = snapshot.data?['Valid'] ?? false;
       if(isValid) {
         return Image.network(
-            snapshot.data?['Url']
+            snapshot.data?['Url'],
+            fit: BoxFit.cover,
+            height: 200,
+            width: double.infinity,
         );
       }
       else {
         return Image.asset(
-          defaultImage
+          defaultImage,
+          fit: BoxFit.cover,
+          height: 200,
+          width: double.infinity,
         );
       }
     });

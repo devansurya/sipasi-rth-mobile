@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:sipasi_rth_mobile/admin/component/ImageApi.dart';
 
 import '../../api/data.dart';
@@ -5,38 +6,87 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
+import '../rth_detail.dart';
+
 class GetCard extends StatelessWidget {
   // final List<Map> data;
 
   final data = DataFetch();
-  List<Widget> getCard(List<Map> data) {
+  List<Widget> getCard(List<Map> data, BuildContext context) {
     List<Column> rows = [];
+
     data.forEach((element) {
       Card card = Card(
         elevation: 4.0,
+        key: ValueKey<String>(element['id_rth']),
+        surfaceTintColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
+        margin: const EdgeInsets.all(8.0), // Added margin for better spacing
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start, // Align children to the start
           children: <Widget>[
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(10.0)),
-              // child: Image.asset(
-              //   "assets/images/default-card.jpg",
-              //   fit: BoxFit.cover,
-              //   height: 150,
-              //   width: double.infinity,
-              // ),
-              child: ImageApi(Url: element['foto_rth'], defaultImage: "assets/images/default-card.jpg",useBaseUrl: true),
+              child: ImageApi(
+                Url: element['foto_rth'],
+                defaultImage: "assets/images/default-card.jpg",
+                useBaseUrl: true,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Adjusted padding
+              child: GestureDetector(
+                onTap: () {
+                  final String key = element['id_rth'];
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RthDetail(idRth: key,)));
+                },
+                child: Text(
+                  element['nama_rth'],
+                  style: const TextStyle(
+                    fontSize: 18.0, // Increased font size for the title
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87, // Improved color for better readability
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1, // Ensure the title stays on one line
+                  semanticsLabel: 'Title', // Accessibility label
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // Adjusted padding
+              child: Text(
+                element['deskripsi_rth'],
+                style: const TextStyle(
+                  fontSize: 14.0, // Slightly smaller font size for the description
+                  color: Colors.black54, // Use a lighter color for the description
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                semanticsLabel: 'Description', // Accessibility label
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Text(
-                element['nama_rth'],
-                style: const TextStyle(fontSize: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      final String key = element['id_rth'];
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => RthDetail(idRth: key,)));
+                    },
+                    child: const Text(
+                      'Selengkapnya..',
+                      style: TextStyle(color: Colors.green), // Button text color
+                    ),
+                  ),
+                ],
               ),
-            )
+            ),
           ],
         ),
       );
@@ -55,9 +105,8 @@ class GetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: data.getRthData(),
+      future: data.getRthData(''),
       builder: (context, snapshot) {
-        log('babt');
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
@@ -71,7 +120,7 @@ class GetCard extends StatelessWidget {
           final parsedData = new List<Map<dynamic, dynamic>>.from(result);
           print(parsedData);
           // return getCard(result);
-          return ListView(children: getCard(parsedData));
+          return ListView(children: getCard(parsedData, context));
         }
       },
     );

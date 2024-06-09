@@ -64,18 +64,18 @@ class DataFetch {
     }
   }
 
-  Future<dynamic> getRthData() async {
+  Future<dynamic> getRthData(String? param) async {
     try {
       String baseUrl = await getBaseUrl();
       // Fetch the token
       String token = await getToken();
-
       // Define the headers with the token
       Map<String, String> requestHeaders = {
         'Authorization': 'Bearer $token',
       };
+      param = param ?? '';
 
-      final response = await http.get(Uri.parse('${baseUrl}rth/'), headers: requestHeaders);
+      final response = await http.get(Uri.parse('${baseUrl}rth/${param}'), headers: requestHeaders);
 
       if(response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
