@@ -21,7 +21,8 @@ class ImageApi extends StatelessWidget {
         'Valid' : false
       };
     }
-    final baseUrl = await DataFetch.getBaseUrl();
+    final baseUrl = await DataFetch.getAssetsUrl();
+
     final newUrl =  (useBaseUrl) ? baseUrl+Url : Url ;
     final response = await http.get(Uri.parse(newUrl));
 

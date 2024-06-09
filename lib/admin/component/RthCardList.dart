@@ -1,3 +1,5 @@
+import 'package:sipasi_rth_mobile/admin/component/ImageApi.dart';
+
 import '../../api/data.dart';
 import 'dart:developer';
 
@@ -9,10 +11,7 @@ class GetCard extends StatelessWidget {
   final data = DataFetch();
   List<Widget> getCard(List<Map> data) {
     List<Column> rows = [];
-    print(data);
-    log('babyyy');
     data.forEach((element) {
-      print(element);
       Card card = Card(
         elevation: 4.0,
         shape: RoundedRectangleBorder(
@@ -23,12 +22,13 @@ class GetCard extends StatelessWidget {
           children: <Widget>[
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(10.0)),
-              child: Image.asset(
-                "assets/images/default-card.jpg",
-                fit: BoxFit.cover,
-                height: 150,
-                width: double.infinity,
-              ),
+              // child: Image.asset(
+              //   "assets/images/default-card.jpg",
+              //   fit: BoxFit.cover,
+              //   height: 150,
+              //   width: double.infinity,
+              // ),
+              child: ImageApi(Url: element['foto_rth'], defaultImage: "assets/images/default-card.jpg",useBaseUrl: true),
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
@@ -57,6 +57,7 @@ class GetCard extends StatelessWidget {
     return FutureBuilder(
       future: data.getRthData(),
       builder: (context, snapshot) {
+        log('babt');
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {

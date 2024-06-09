@@ -18,14 +18,17 @@ class DataFetch {
       };
 
       String baseUrl = await getBaseUrl();
+      //log(baseUrl);
 
       final response = await http.post(Uri.parse('${baseUrl}auth/'), body: fields);
+      //print(response);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         final String now =DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
-
+        log(now);
         String newToken = data['data']['token'];
+        log(newToken);
         // save to local database
         var userToken = Setting(
           code: 'UserToken',
@@ -33,15 +36,23 @@ class DataFetch {
           desc: 'Token used to get data from api',
           createDate: now
         );
+
         var userName = Setting(
           code: 'UserName',
-          value: data['data']['username'], // Assuming token is a String
+          value: data['data']['user']['nama'], // Assuming token is a String
           desc: 'Username from api',
           createDate: now
+        );
+        var userData = Setting(
+            code: 'UserData',
+            value: jsonEncode(data['data']['user']), // Assuming token is a String
+            desc: 'UserData from api',
+            createDate: now
         );
         //updates the token in the local db
         await DB.instance.insertSetting(userToken);
         await DB.instance.insertSetting(userName);
+        await DB.instance.insertSetting(userData);
 
         return data;
       } else {
@@ -104,6 +115,11 @@ class DataFetch {
     await dotenv.load(fileName: ".env");
 
     return dotenv.get("API_URL") ?? 'http://192.168.1.6/sipasi-rth/api/';
+  }
+  static Future<String> getAssetsUrl() async {
+    await dotenv.load(fileName: ".env");
+
+    return dotenv.get("ASSETS_URL") ?? 'http://192.168.1.206/sipasi-rth/';
   }
 }
 
