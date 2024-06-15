@@ -5,21 +5,25 @@ import 'package:sipasi_rth_mobile/admin/rth.dart';
 import 'package:sipasi_rth_mobile/admin/pengaduan.dart';
 import 'package:provider/provider.dart';
 
+import '../Home.dart';
 import '../app_state.dart';
 
 //index of admin
 class Index extends StatefulWidget {
+  const Index({super.key});
+
   @override
   _IndexView createState() => _IndexView();
 }
 
 class _IndexView extends State<Index> {
   static final List<Widget> _widgetOptions = <Widget>[
-    Rth(),
-    Pengaduan(),
-    Profile()
+    const Rth(),
+    const Pengaduan(),
+    Home(useAppbar: false),
+    const Profile()
   ];
-  int _selectedIndex = 0;
+  int _selectedIndex = 2;
 
   void _onItemTapped(index) {
     setState(() {
@@ -32,6 +36,7 @@ class _IndexView extends State<Index> {
     return PopScope(
       canPop: false,
       child: Scaffold(
+        backgroundColor: Colors.transparent, // Set Scaffold background to transparent
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(1000),
           child: Container(
@@ -90,6 +95,10 @@ class _IndexView extends State<Index> {
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
         bottomNavigationBar: BottomNavigationBar(
+          elevation: 10.0,
+          unselectedItemColor: Colors.black.withOpacity(0.6), // A
+          showUnselectedLabels: true,// djust opacity or color
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold), // Adjust text style
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.list),
@@ -100,6 +109,10 @@ class _IndexView extends State<Index> {
               label: 'Pengaduan',
             ),
             BottomNavigationBarItem(
+              icon: FaIcon(FontAwesomeIcons.house, ),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.user),
               label: 'Profile',
             ),
@@ -107,8 +120,8 @@ class _IndexView extends State<Index> {
           currentIndex: _selectedIndex,
           selectedItemColor: Colors.green,
           onTap: _onItemTapped,
+        )
         ),
-      ),);
-   ;
+    );
   }
 }

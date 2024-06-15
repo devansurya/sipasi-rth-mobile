@@ -1,13 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:developer';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:sipasi_rth_mobile/model/setting.dart';
 
 class DB {
-  static final String databaseName = "sipasi.db";
-  static final int databaseVersion = 1;
+  static const String databaseName = "sipasi.db";
+  static const int databaseVersion = 1;
 
   DB._privateConstructor();
   static final DB instance = DB._privateConstructor();
@@ -68,6 +67,7 @@ class DB {
     catch(e){
       print(e);
     }
+    return null;
   }
 
   Future<Map<String?, Object?>> getFullSetting(String code) async {

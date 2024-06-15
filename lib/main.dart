@@ -21,14 +21,14 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
-  const MyApp({super.key, required  bool this.isLoggedIn});
+  const MyApp({super.key, required  this.isLoggedIn});
 
   _defaultView(bool isLoggedIn) {
     if(isLoggedIn) {
-      return Index();
+      return const Index();
     }
     else {
-      return LoginView();
+      return const LoginView();
     }
   }
 
@@ -40,9 +40,10 @@ class MyApp extends StatelessWidget {
       child :MaterialApp(
         title: dotenv.get('APP_NAME_SHORT'),
         theme: ThemeData(
+          fontFamily: 'Urbanist',
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           useMaterial3: true,
-          pageTransitionsTheme: PageTransitionsTheme(
+          pageTransitionsTheme: const PageTransitionsTheme(
             builders: {
               TargetPlatform.iOS: CupertinoPageTransitionsBuilder(), // Use default transition for iOS
             },

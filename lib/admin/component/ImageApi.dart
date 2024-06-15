@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../api/data.dart';
-import 'dart:developer';
 
 class ImageApi extends StatelessWidget {
   final String Url;
   String defaultImage = '';
   bool useBaseUrl = true;
 
-  ImageApi({
+  ImageApi({super.key, 
     required this.Url,
     this.useBaseUrl= true,
     this.defaultImage = 'images/default',

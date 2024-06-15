@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:sipasi_rth_mobile/admin/component/ImageApi.dart';
 
 import '../../api/data.dart';
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
@@ -12,10 +10,12 @@ class GetCard extends StatelessWidget {
   // final List<Map> data;
 
   final data = DataFetch();
+
+  GetCard({super.key});
   List<Widget> getCard(List<Map> data, BuildContext context) {
     List<Column> rows = [];
 
-    data.forEach((element) {
+    for (var element in data) {
       Card card = Card(
         elevation: 4.0,
         key: ValueKey<String>(element['id_rth']),
@@ -98,7 +98,7 @@ class GetCard extends StatelessWidget {
       );
 
       rows.add(column);
-    });
+    }
     return rows;
   }
 
@@ -108,16 +108,16 @@ class GetCard extends StatelessWidget {
       future: data.getRthData(''),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text('No data available'));
+          return const Center(child: Text('No data available'));
         }
         else {
           // print(snapshot.data['data']);
           final result = snapshot.data['data'];
-          final parsedData = new List<Map<dynamic, dynamic>>.from(result);
+          final parsedData = List<Map<dynamic, dynamic>>.from(result);
           print(parsedData);
           // return getCard(result);
           return ListView(children: getCard(parsedData, context));

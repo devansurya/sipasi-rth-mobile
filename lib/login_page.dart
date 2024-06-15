@@ -3,7 +3,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:sipasi_rth_mobile/admin/index.dart';
-import 'admin/rth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'api/data.dart';
 
@@ -58,7 +57,7 @@ class LoginLayout extends State<LoginView> {
       final response = await data.login(email: emailController.text, pass: passController.text);
       log(jsonEncode(response));
       if (response != null && response['code'] == 200) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Index()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const Index()));
       } else {
         Fluttertoast.showToast(
           msg: 'Login failed. Please check your credentials.',
