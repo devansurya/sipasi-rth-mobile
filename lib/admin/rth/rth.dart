@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'component/RthCardList.dart';
+import '../component/RthCardList.dart';
 
 class Rth extends StatefulWidget {
   const Rth({super.key});

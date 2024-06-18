@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'dart:developer';
 import 'package:sipasi_rth_mobile/model/setting.dart';
 import '../helper/database.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:intl/intl.dart';
 
 class DataFetch {
   // String baseUrl = 'http://192.168.1.6/sipasi-rth/api/';
@@ -79,11 +82,10 @@ class DataFetch {
 
       if(response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
-
         return data;
       }
       else{
-        throw Exception('Login Failed : '+jsonDecode(response.body)['error']);
+        throw Exception('Failed to fetch data : '+jsonDecode(response.body)['error']);
       }
     }
     catch(error) {
@@ -96,7 +98,6 @@ class DataFetch {
   static Future<dynamic> getToken() async {
       return await DB.instance.getSetting('UserToken');
   }
-
   //check if user is already logged in before or not
   static Future<bool> checkLogin() async {
     final Map<String?, Object?> token = await DB.instance.getFullSetting('userToken');
@@ -120,6 +121,67 @@ class DataFetch {
     await dotenv.load(fileName: ".env");
 
     return dotenv.get("ASSETS_URL") ?? 'http://192.168.1.206/sipasi-rth/';
+  }
+
+  static Future<dynamic> sendData({required Map<String, dynamic> formData, required String endpoint, File? file, String method = 'POST'}) async {
+    String baseUrl = await getBaseUrl();
+    // Fetch the token
+    String token = await getToken();
+    print(formData);
+
+    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl$endpoint'));
+    request.headers['Authorization'] = 'Bearer $token';
+
+    formData.forEach((key, value) {
+      request.fields[key] = value.toString(); // Convert all values to String
+    });
+    if(file != null) {
+      request.files.add(await http.MultipartFile.fromPath('foto', file.path));
+    }
+
+    try{
+      var response = await request.send();
+      var responseBody = await http.Response.fromStream(response);
+      log(responseBody.body);
+      if(response.statusCode == 200) {
+        final data = jsonDecode(responseBody.body) as Map<String, dynamic>;
+        return data;
+      }
+      else{
+        print(responseBody);
+        throw Exception('Failed to fetch data : '+jsonDecode(responseBody.body)['error']);
+      }
+    }
+    catch(error) {
+      showError(error.toString());
+      throw Exception(error);
+    }
+  }
+
+  static Future<dynamic> getPublicData({required String endpoint}) async {
+    try {
+      String baseUrl = await getBaseUrl();
+
+      final response = await http.get(Uri.parse('${baseUrl}public/$endpoint'));
+      if(response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return data;
+      }
+      else{
+        throw Exception('Failed to fetch data :  '+jsonDecode(response.body)['error']);
+      }
+    }
+    catch(error) {
+      showError(error.toString());
+      throw Exception(error);
+    }
+  }
+  // error handler
+  static void showError(String error) {
+    Fluttertoast.showToast(
+      msg: error,
+      backgroundColor: Colors.grey,
+    );
   }
 }
 

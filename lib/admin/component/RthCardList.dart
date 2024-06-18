@@ -1,10 +1,7 @@
 import 'package:sipasi_rth_mobile/admin/component/ImageApi.dart';
-
 import '../../api/data.dart';
-
 import 'package:flutter/material.dart';
-
-import '../rth_detail.dart';
+import '../rth/rth_detail.dart';
 
 class GetCard extends StatelessWidget {
   // final List<Map> data;

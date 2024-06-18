@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sipasi_rth_mobile/admin/profile.dart';
-import 'package:sipasi_rth_mobile/admin/rth.dart';
-import 'package:sipasi_rth_mobile/admin/pengaduan.dart';
+import 'package:sipasi_rth_mobile/admin/rth/rth.dart';
+import 'package:sipasi_rth_mobile/admin/pengaduan/pengaduan.dart';
 import 'package:provider/provider.dart';
 
 import '../Home.dart';
@@ -98,7 +98,7 @@ class _IndexView extends State<Index> {
           elevation: 10.0,
           unselectedItemColor: Colors.black.withOpacity(0.6), // A
           showUnselectedLabels: true,// djust opacity or color
-          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold), // Adjust text style
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold), // Adjust text style
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: FaIcon(FontAwesomeIcons.list),

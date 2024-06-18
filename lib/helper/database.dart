@@ -98,7 +98,6 @@ class DB {
 
   Future<bool> deleteSetting(String code) async {
     final db = await database;
-    log('message');
     final int count = await db.delete(
       'Setting',
       where: 'code = ?',

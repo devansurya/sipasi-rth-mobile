@@ -1,4 +1,3 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,7 +5,7 @@ import 'package:expansion_tile_card/expansion_tile_card.dart';
 
 class Home extends StatelessWidget {
   bool useAppbar = true;
-  Home({this.useAppbar = true});
+  Home({super.key, this.useAppbar = true});
 
   PreferredSizeWidget ? getAppBar() {
     PreferredSizeWidget ? appbar;
@@ -49,13 +48,15 @@ class Home extends StatelessWidget {
       appBar:getAppBar(),
       backgroundColor: Colors.black12,
       body: Container(
-        decoration: BoxDecoration(color: Colors.white),
-        child: HomeListElements(),
+        decoration: const BoxDecoration(color: Colors.white),
+        child: const HomeListElements(),
       ),
     );
   }
 }
 class HomeListElements extends StatefulWidget {
+  const HomeListElements({super.key});
+
   @override
   createState() => _HomeList();
 }
@@ -65,11 +66,11 @@ class _HomeList extends State<HomeListElements>{
   @override
   Widget build(BuildContext context) {
       return ListView(
-        children: <Widget>[
-          const InfoCard(),
+        children: const <Widget>[
+          InfoCard(),
           RthInfo(),
-          const PrivacyInfo(),
-          const FAQ()
+          PrivacyInfo(),
+          FAQ()
         ],
       );
   }
@@ -126,12 +127,12 @@ class RthInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          const Text('Jaga hijau kita!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.left,),
-          const Text('Reservasi mudah, Pengaduan cepat!', style: TextStyle(fontWeight: FontWeight.w300),textAlign: TextAlign.left,),
+          Text('Jaga hijau kita!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.left,),
+          Text('Reservasi mudah, Pengaduan cepat!', style: TextStyle(fontWeight: FontWeight.w300),textAlign: TextAlign.left,),
           Padding(
             padding: EdgeInsets.only(top: 30,left: 20, right: 20),
             child: Row(
@@ -178,7 +179,7 @@ class PrivacyInfo extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(10.0),
             child: FractionallySizedBox(
               widthFactor: 0.9,
               // alignment: ,
