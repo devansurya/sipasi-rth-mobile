@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -31,10 +32,14 @@ class _FormPengaduanState extends State<FormPengaduan> {
   bool _isPrevImageVisible = false;
   File? _file = null;
   final ImagePicker _picker = ImagePicker();
+  bool _isNameDisabled = false;
+  bool _isEmailDisabled = false;
+  Future<dynamic> _myFuture = DataFetch.getDetailPengaduan();
 
   @override
   void initState() {
     super.initState();
+    _myFuture = DataFetch.getDetailPengaduan();
     formdata = {
       'id_rth': widget.id,
       'id_pengaduan': widget.idPengaduan,
@@ -143,142 +148,164 @@ class _FormPengaduanState extends State<FormPengaduan> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: DataFetch.getBaseUrl(),
+        future: _myFuture,
         builder: (context, snapshot) {
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text('Form Pengaduan'), // Updated title
-            ),
-            body: ListView(
-              padding: const EdgeInsets.only(left: 10,right: 10),
-              children: <Widget>[
-                Padding(
-                    padding: const EdgeInsets.only(top: 5,bottom: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            CustomTheme.primaryText('Nama'),
-                            const Text('*', style: TextStyle(color: Colors.red)),
-                          ],
-                        ),
-                        TextField(controller: nameController),
-                      ],
-                    )
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 5,bottom: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            CustomTheme.primaryText('Email'),
-                            const Text('*', style: TextStyle(color: Colors.red)),
-                          ],
-                        ),
-                        TextField(controller: emailController),
-                      ],
-                    )
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 5,bottom: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            CustomTheme.primaryText('Privasi'),
-                            const Text('*', style: TextStyle(color: Colors.red),),
-                          ],
-                        ),
-                        DropdownData(onChanged: (value) => updateFormData('visibilitas', value)),
-                      ],
-                    )
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 5,bottom: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            CustomTheme.primaryText('Jenis Pengaduan'),
-                            const Text('*', style: TextStyle(color: Colors.red)),
-                          ],
-                        ),
-                        DropdownData(onChanged: (value) => updateFormData('jenis_pengaduan', value),endpoint: 'jenis_pengaduan',),
-                      ],
-                    )
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 5,bottom: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            CustomTheme.primaryText('Judul'),
-                            const Text('*', style: TextStyle(color: Colors.red),),
-                          ],
-                        ),
-                        TextField(controller: judulController),
-                      ],
-                    )
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 5,bottom: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            CustomTheme.primaryText('Deskripsi'),
-                            const Text('*', style: TextStyle(color: Colors.red),),
-                          ],
-                        ),
-                        TextField(controller: deskripsiController, keyboardType: TextInputType.multiline, minLines: 3, maxLines: 5),
-                      ],
-                    )
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 5,bottom: 5),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          children: [
-                            CustomTheme.primaryText('Detail Lokasi'),
-                            const Text('*', style: TextStyle(color: Colors.red),),
-                          ],
-                        ),
-                        TextField(controller: lokasiController, keyboardType: TextInputType.multiline, minLines: 3, maxLines: 5),
-                      ],
-                    )
-                ),
-                Padding(
-                    padding: const EdgeInsets.only(top: 5,bottom: 5),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        CustomTheme.primaryText('Lampiran'),
-                        Flex(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            direction: Axis.horizontal,
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No data available'));
+          }
+          else {
+            print(snapshot.data['userdata']);
+            if(snapshot.data['userdata'] != null) {
+              nameController.text = snapshot.data['userdata']['nama'] ?? '';
+              emailController.text = snapshot.data['userdata']['email'] ?? '';
+              if(nameController.text.isNotEmpty){
+                _isNameDisabled = true;
+              }
+              if(emailController.text.isNotEmpty){
+                _isEmailDisabled = true;
+              }
+              formdata['id_user'] = snapshot.data['userdata']['id_user'];
+            }
+
+            return Scaffold(
+              appBar: AppBar(
+                title: const Text('Form Pengaduan'), // Updated title
+              ),
+              body: ListView(
+                padding: const EdgeInsets.only(left: 10,right: 10),
+                children: <Widget>[
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
                             children: [
-                              ElevatedButton(
-                                onPressed: _uploadFile,
-                                child: const Row(children: [Text('Tambah foto '), FaIcon(FontAwesomeIcons.file, size: 16)]),
-                              ),
-                              ElevatedButton(
-                                onPressed: _pickImageFromCamera,
-                                child: const Row(children: [Text('Tambah Dari kamera '), FaIcon(FontAwesomeIcons.camera,size: 16,)]),
-                              ),
-                            ]),
-                        CustomTheme.secondaryText('* File harus berupa image dengan ukuran < 2MB'),
-                        Visibility(visible: _isPrevImageVisible, child: Center(child: SizedBox(height: 200,child: _prevImage),)),
-                        ElevatedButton(onPressed: () =>sendData(context), child: const Text('Kirim'))
-                      ],
-                    )
-                ),
-              ],
-            ),
-          );
+                              CustomTheme.primaryText('Nama'),
+                              const Text('*', style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                          TextField(controller: nameController,readOnly: _isNameDisabled,),
+                        ],
+                      )
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              CustomTheme.primaryText('Email'),
+                              const Text('*', style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                          TextField(controller: emailController, readOnly: _isEmailDisabled,),
+                        ],
+                      )
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              CustomTheme.primaryText('Privasi'),
+                              const Text('*', style: TextStyle(color: Colors.red),),
+                            ],
+                          ),
+                          DropdownData(onChanged: (value) => updateFormData('visibilitas', value)),
+                        ],
+                      )
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              CustomTheme.primaryText('Jenis Pengaduan'),
+                              const Text('*', style: TextStyle(color: Colors.red)),
+                            ],
+                          ),
+                          DropdownData(onChanged: (value) => updateFormData('jenis_pengaduan', value),endpoint: 'jenis_pengaduan',),
+                        ],
+                      )
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              CustomTheme.primaryText('Judul'),
+                              const Text('*', style: TextStyle(color: Colors.red),),
+                            ],
+                          ),
+                          TextField(controller: judulController),
+                        ],
+                      )
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              CustomTheme.primaryText('Deskripsi'),
+                              const Text('*', style: TextStyle(color: Colors.red),),
+                            ],
+                          ),
+                          TextField(controller: deskripsiController, keyboardType: TextInputType.multiline, minLines: 3, maxLines: 5),
+                        ],
+                      )
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            children: [
+                              CustomTheme.primaryText('Detail Lokasi'),
+                              const Text('*', style: TextStyle(color: Colors.red),),
+                            ],
+                          ),
+                          TextField(controller: lokasiController, keyboardType: TextInputType.multiline, minLines: 3, maxLines: 5),
+                        ],
+                      )
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.only(top: 5,bottom: 5),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          CustomTheme.primaryText('Lampiran'),
+                          Flex(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              direction: Axis.horizontal,
+                              children: [
+                                ElevatedButton(
+                                  onPressed: _uploadFile,
+                                  child: const Row(children: [Text('Tambah foto '), FaIcon(FontAwesomeIcons.file, size: 16)]),
+                                ),
+                                ElevatedButton(
+                                  onPressed: _pickImageFromCamera,
+                                  child: const Row(children: [Text('Tambah Dari kamera '), FaIcon(FontAwesomeIcons.camera,size: 16,)]),
+                                ),
+                              ]),
+                          CustomTheme.secondaryText('* File harus berupa image dengan ukuran < 2MB'),
+                          Visibility(visible: _isPrevImageVisible, child: Center(child: SizedBox(height: 200,child: _prevImage),)),
+                          ElevatedButton(onPressed: () =>sendData(context), child: const Text('Kirim'))
+                        ],
+                      )
+                  ),
+                ],
+              ),
+            );
+          }
         },
     );
   }

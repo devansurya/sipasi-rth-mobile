@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:sipasi_rth_mobile/admin/component/AlertWidget.dart';
-import 'package:sipasi_rth_mobile/admin/component/ImageApi.dart';
+import 'package:sipasi_rth_mobile/dashboard/component/AlertWidget.dart';
+import 'package:sipasi_rth_mobile/dashboard/component/ImageApi.dart';
 import '../../api/data.dart';
+import '../../helper/CustomTheme.dart';
 import '../pengaduan/FormPengaduan.dart';
 
 class RthDetail extends StatefulWidget {
@@ -105,6 +106,7 @@ class _RthDetailState extends State<RthDetail>{
                 ],
               ),
             ),
+            Padding(padding: const EdgeInsets.only(top: 10,bottom: 10),child: CustomTheme.activeText('Ditambahkan pada ${CustomTheme.formatDate(dataItem['create_date'])}'),),
             const SizedBox(height: 16.0),
             const SizedBox(height: 8.0),
             Text(
@@ -116,7 +118,7 @@ class _RthDetailState extends State<RthDetail>{
             ),
             const SizedBox(height: 16.0),
             const Text(
-              'Alamat:',
+              'Alamat : ',
               style: TextStyle(
                 fontSize: 18.0,
                 fontWeight: FontWeight.bold,
@@ -150,9 +152,11 @@ class _RthDetailState extends State<RthDetail>{
           ),
         )
     );
-    setState(() {
-      _alert = newAlert;
-    });
+    if(data != null) {
+      setState(() {
+        _alert = newAlert;
+      });
+    }
   }
 
   @override
@@ -163,7 +167,7 @@ class _RthDetailState extends State<RthDetail>{
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: widget.data.getRthData('?id_rth=$idRth'), builder: (context, snapshot){
+    return FutureBuilder(future: DataFetch.getRthData('?id_rth=$idRth'), builder: (context, snapshot){
       if (snapshot.connectionState == ConnectionState.waiting) {
         return const Center(child: CircularProgressIndicator());
       } else if (snapshot.hasError) {

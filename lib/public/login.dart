@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:sipasi_rth_mobile/admin/index.dart';
+import 'package:sipasi_rth_mobile/dashboard/index.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'api/data.dart';
+import '../api/data.dart';
 
 
 class LoginView extends StatefulWidget {

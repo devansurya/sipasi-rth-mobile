@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sipasi_rth_mobile/admin/component/pengaduanitem.dart';
+import 'package:sipasi_rth_mobile/dashboard/component/pengaduanitem.dart';
 
 class Pengaduan extends StatelessWidget {
   const Pengaduan({super.key});

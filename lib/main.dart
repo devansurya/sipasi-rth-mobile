@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:sipasi_rth_mobile/helper/database.dart';
-import 'admin/index.dart';
+import 'package:sipasi_rth_mobile/public/login.dart';
+import 'dashboard/index.dart';
 import 'api/data.dart';
 import 'app_state.dart';
-import 'login_page.dart';
 import 'package:flutter/services.dart';
 
 Future<void> main() async {

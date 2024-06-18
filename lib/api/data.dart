@@ -67,7 +67,7 @@ class DataFetch {
     }
   }
 
-  Future<dynamic> getRthData(String? param) async {
+  static Future<dynamic> getRthData(String? param) async {
     try {
       String baseUrl = await getBaseUrl();
       // Fetch the token
@@ -182,6 +182,42 @@ class DataFetch {
       msg: error,
       backgroundColor: Colors.grey,
     );
+  }
+
+  //get pengaduan detail
+  static Future<dynamic> getDetailPengaduan({String? idPengaduan, String? idRth}) async {
+    String baseUrl = await getBaseUrl();
+    String? userData = await DB.instance.getSetting('UserData');
+
+    Map<String, dynamic> decodedUserData = {
+      'id_user' : null,
+      'email' : null,
+      'id_role' : '3',
+      'nama' : 'Guest',
+      'role' : 'Guest',
+    };
+
+    if(userData != null) {
+      try {
+        decodedUserData = jsonDecode(userData);
+      }
+      catch(error) {
+        showError(error.toString());
+        throw Exception(error);
+      }
+    }
+
+    var rthData = await getPublicData(endpoint: 'rth?$idRth');
+    var pengaduan = idPengaduan != null ? getPublicData(endpoint: 'pengaduan?$idPengaduan') : null;
+
+    Map<String, dynamic> result = {
+      'rth' : rthData,
+      'pengaduan' :pengaduan,
+      'userdata' : decodedUserData
+    };
+
+    return result;
+
   }
 }
 

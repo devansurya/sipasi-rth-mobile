@@ -1,4 +1,4 @@
-import 'package:sipasi_rth_mobile/admin/component/ImageApi.dart';
+import 'package:sipasi_rth_mobile/dashboard/component/ImageApi.dart';
 import '../../api/data.dart';
 import 'package:flutter/material.dart';
 import '../rth/rth_detail.dart';
@@ -102,7 +102,7 @@ class GetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: data.getRthData(''),
+      future: DataFetch.getRthData(''),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
