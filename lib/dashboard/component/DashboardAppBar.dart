@@ -77,7 +77,6 @@ class _DashboardAppBarWidgetState extends State<DashboardAppBarWidget> {
     return FutureBuilder<String?>(
       future: _cachedData,
       builder: (context, snapshot) {
-        print(snapshot.data);
         if (snapshot.connectionState == ConnectionState.waiting) {
           return _container();
         } else if (snapshot.hasError) {

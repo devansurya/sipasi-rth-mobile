@@ -28,11 +28,4 @@ class CustomTheme {
     return Text(text, style: whiteTextStyle);
   }
 
-  static String formatDate(String dateStr) {
-    // Parse the date string
-    DateTime dateTime = DateFormat("yyyy-MM-dd HH:mm:ss").parse(dateStr);
-    // Format the date to the desired format
-    String formattedDate = DateFormat("dd MMM yyyy").format(dateTime).toUpperCase();
-    return formattedDate;  // Output: 18 MAY 2024
-  }
 }

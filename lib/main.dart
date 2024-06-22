@@ -41,13 +41,8 @@ class MyApp extends StatelessWidget {
         title: dotenv.get('APP_NAME_SHORT'),
         theme: ThemeData(
           fontFamily: 'Urbanist',
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.green, background: Colors.white),
           useMaterial3: true,
-          pageTransitionsTheme: const PageTransitionsTheme(
-            builders: {
-              TargetPlatform.iOS: CupertinoPageTransitionsBuilder(), // Use default transition for iOS
-            },
-          ),
         ),
         home: _defaultView(isLoggedIn),
       )

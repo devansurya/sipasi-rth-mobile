@@ -6,11 +6,13 @@ class ImageApi extends StatelessWidget {
   final String Url;
   String defaultImage = '';
   bool useBaseUrl = true;
+  double? height;
 
   ImageApi({super.key, 
     required this.Url,
     this.useBaseUrl= true,
     this.defaultImage = 'images/default',
+    this.height
   });
 
   Future<Map<String, dynamic>> checkValid() async{
@@ -47,7 +49,7 @@ class ImageApi extends StatelessWidget {
         return Image.network(
             snapshot.data?['Url'],
             fit: BoxFit.cover,
-            height: 200,
+            height: height ?? 200,
             width: double.infinity,
         );
       }

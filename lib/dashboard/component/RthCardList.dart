@@ -1,7 +1,10 @@
+import 'dart:developer';
+
 import 'package:sipasi_rth_mobile/dashboard/component/ImageApi.dart';
+import 'package:sipasi_rth_mobile/public/login.dart';
 import '../../api/data.dart';
 import 'package:flutter/material.dart';
-import '../rth/rth_detail.dart';
+import '../rth/Rth_detail.dart';
 
 class GetCard extends StatelessWidget {
   // final List<Map> data;
@@ -112,10 +115,13 @@ class GetCard extends StatelessWidget {
           return const Center(child: Text('No data available'));
         }
         else {
+
+          if(snapshot.data == 'relog') {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => LoginView()));
+          }
           // print(snapshot.data['data']);
           final result = snapshot.data['data'];
           final parsedData = List<Map<dynamic, dynamic>>.from(result);
-          print(parsedData);
           // return getCard(result);
           return ListView(children: getCard(parsedData, context));
         }

@@ -4,6 +4,7 @@ import 'package:flutter/painting.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sipasi_rth_mobile/dashboard/component/AlertWidget.dart';
 import 'package:sipasi_rth_mobile/dashboard/component/ImageApi.dart';
+import 'package:sipasi_rth_mobile/helper/Helper.dart';
 import '../../api/data.dart';
 import '../../helper/CustomTheme.dart';
 import '../pengaduan/FormPengaduan.dart';
@@ -106,7 +107,7 @@ class _RthDetailState extends State<RthDetail>{
                 ],
               ),
             ),
-            Padding(padding: const EdgeInsets.only(top: 10,bottom: 10),child: CustomTheme.activeText('Ditambahkan pada ${CustomTheme.formatDate(dataItem['create_date'])}'),),
+            Padding(padding: const EdgeInsets.only(top: 10,bottom: 10),child: CustomTheme.activeText('Ditambahkan pada ${Helper.formatDate(dataItem['create_date'])}'),),
             const SizedBox(height: 16.0),
             const SizedBox(height: 8.0),
             Text(

@@ -84,6 +84,9 @@ class DataFetch {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         return data;
       }
+      else if(response.statusCode == 401) {
+        return 'relog';
+      }
       else{
         throw Exception('Failed to fetch data : '+jsonDecode(response.body)['error']);
       }
@@ -127,14 +130,15 @@ class DataFetch {
     String baseUrl = await getBaseUrl();
     // Fetch the token
     String token = await getToken();
-    print(formData);
 
-    var request = http.MultipartRequest('POST', Uri.parse('$baseUrl$endpoint'));
+    var request = http.MultipartRequest(method, Uri.parse('$baseUrl$endpoint'));
     request.headers['Authorization'] = 'Bearer $token';
 
     formData.forEach((key, value) {
       request.fields[key] = value.toString(); // Convert all values to String
     });
+    log(request.toString());
+
     if(file != null) {
       request.files.add(await http.MultipartFile.fromPath('foto', file.path));
     }
@@ -160,12 +164,45 @@ class DataFetch {
 
   static Future<dynamic> getPublicData({required String endpoint}) async {
     try {
+      log(endpoint);
       String baseUrl = await getBaseUrl();
 
+
       final response = await http.get(Uri.parse('${baseUrl}public/$endpoint'));
+
       if(response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
         return data;
+      }
+      else{
+        throw Exception('Failed to fetch data :  '+jsonDecode(response.body)['error']);
+      }
+    }
+    catch(error) {
+      showError(error.toString());
+      throw Exception(error);
+    }
+  }
+
+  static Future<dynamic> get({required String endpoint, String param=''}) async {
+    try {
+      String token = await getToken();
+      String baseUrl = await getBaseUrl();
+      // Define the headers with the token
+      Map<String, String> requestHeaders = {
+        'Authorization': 'Bearer $token',
+      };
+
+      param = '?$param' ?? '';
+
+      final response = await http.get(Uri.parse('$baseUrl$endpoint$param'), headers: requestHeaders);
+
+      if(response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return data;
+      }
+      else if (response.statusCode == 401) {
+
       }
       else{
         throw Exception('Failed to fetch data :  '+jsonDecode(response.body)['error']);
@@ -184,11 +221,24 @@ class DataFetch {
     );
   }
 
+  static Future<dynamic> relog(BuildContext context) async{
+
+
+    // final Map<String?, Object?> userdata = await DB.instance.getFullSetting('UserData');
+
+    // final Map<String, String> fields = {
+    //   'email': userdata['email'],
+    //   'password': pass,
+    // };
+
+    // String baseUrl = await getBaseUrl();
+
+    // final response = await http.post(Uri.parse('${baseUrl}auth/'), body: fields);
+}
   //get pengaduan detail
   static Future<dynamic> getDetailPengaduan({String? idPengaduan, String? idRth}) async {
     String baseUrl = await getBaseUrl();
     String? userData = await DB.instance.getSetting('UserData');
-
     Map<String, dynamic> decodedUserData = {
       'id_user' : null,
       'email' : null,
@@ -206,9 +256,11 @@ class DataFetch {
         throw Exception(error);
       }
     }
+    String param = idPengaduan != null ? 'id_pengaduan=$idPengaduan' :'';
 
     var rthData = await getPublicData(endpoint: 'rth?$idRth');
-    var pengaduan = idPengaduan != null ? getPublicData(endpoint: 'pengaduan?$idPengaduan') : null;
+    var pengaduan = idPengaduan != null ? await getPublicData(endpoint: 'pengaduan?$param') : null;
+    log(pengaduan.toString());
 
     Map<String, dynamic> result = {
       'rth' : rthData,

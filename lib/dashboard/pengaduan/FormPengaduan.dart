@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:sipasi_rth_mobile/dashboard/component/ImageApi.dart';
+import 'package:sipasi_rth_mobile/helper/Helper.dart';
 import '../../api/data.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -12,13 +14,13 @@ import '../../helper/CustomTheme.dart';
 class FormPengaduan extends StatefulWidget {
   final String type;
   final int? id;
-  final int? idPengaduan;
+  final String? idPengaduan;
 
   const FormPengaduan({super.key, this.type = 'New', this.id, this.idPengaduan});
 
 
   @override
-  _FormPengaduanState createState() => _FormPengaduanState();
+  _FormPengaduanState createState() => _FormPengaduanState(idPengaduan);
 }
 
 class _FormPengaduanState extends State<FormPengaduan> {
@@ -34,12 +36,20 @@ class _FormPengaduanState extends State<FormPengaduan> {
   final ImagePicker _picker = ImagePicker();
   bool _isNameDisabled = false;
   bool _isEmailDisabled = false;
-  Future<dynamic> _myFuture = DataFetch.getDetailPengaduan();
+  bool _isImageChanged = false;
+  final String? idPengaduan;
+  String? _defaultPengaduan;
+  String? _defaultPrivasi;
+  bool _isLoaded = false;
+
+
+  _FormPengaduanState(String? this.idPengaduan);
+  late Future<dynamic> _myFuture;
 
   @override
   void initState() {
     super.initState();
-    _myFuture = DataFetch.getDetailPengaduan();
+    _myFuture = DataFetch.getDetailPengaduan(idPengaduan: idPengaduan);
     formdata = {
       'id_rth': widget.id,
       'id_pengaduan': widget.idPengaduan,
@@ -55,7 +65,8 @@ class _FormPengaduanState extends State<FormPengaduan> {
 
   void sendData(BuildContext context) async {
       if(validateForm()) {
-        var response = await DataFetch.sendData(endpoint: 'Pengaduan',formData: formdata,file: _file);
+        final String method = idPengaduan != null ? 'PATCH' : 'POST' ;
+        var response = await DataFetch.sendData(endpoint: 'Pengaduan',formData: formdata,file: _file, method: method);
         if(response != null) {
           Navigator.pop(context, response);
         }
@@ -125,6 +136,7 @@ class _FormPengaduanState extends State<FormPengaduan> {
       File imageFile = File(path.replaceFirst('file://', ''));
       setState(() {
         _file = imageFile;
+        _isImageChanged=true;
         _prevImage = Image.file(imageFile);
         _isPrevImageVisible = true;
       });
@@ -139,6 +151,7 @@ class _FormPengaduanState extends State<FormPengaduan> {
       File imageFile = File(path);
       setState(() {
         _file = imageFile;
+        _isImageChanged=true;
         _prevImage = Image.file(imageFile);
         _isPrevImageVisible = true;
       });
@@ -151,15 +164,14 @@ class _FormPengaduanState extends State<FormPengaduan> {
         future: _myFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Helper.circleIndicator();
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No data available'));
           }
           else {
-            print(snapshot.data['userdata']);
-            if(snapshot.data['userdata'] != null) {
+            if(snapshot.data['userdata'] != null && snapshot.data['pengaduan'] == null) {
               nameController.text = snapshot.data['userdata']['nama'] ?? '';
               emailController.text = snapshot.data['userdata']['email'] ?? '';
               if(nameController.text.isNotEmpty){
@@ -169,6 +181,29 @@ class _FormPengaduanState extends State<FormPengaduan> {
                 _isEmailDisabled = true;
               }
               formdata['id_user'] = snapshot.data['userdata']['id_user'];
+            }
+            if(snapshot.data['pengaduan'] != null && !_isLoaded) {
+              var pengaduanData = snapshot.data['pengaduan']['data'];
+              nameController.text = pengaduanData['nama_pengadu'] ?? pengaduanData['nama'] ?? '';
+              emailController.text = pengaduanData['email_pengadu'] ?? pengaduanData['email'] ?? '';
+
+              if(nameController.text.isNotEmpty){
+                _isNameDisabled = true;
+              }
+              if(emailController.text.isNotEmpty){
+                _isEmailDisabled = true;
+              }
+              judulController.text = pengaduanData['subjek'] ?? '';
+              deskripsiController.text = pengaduanData['deskripsi_pengaduan'] ?? '';
+              lokasiController.text = pengaduanData['lokasi'] ?? '';
+              if(pengaduanData['foto'] != '') {
+                _prevImage = ImageApi(Url: pengaduanData['foto'], useBaseUrl: true, defaultImage:"assets/images/default-card.jpg");
+                _isPrevImageVisible = true;
+              }
+              _defaultPrivasi = pengaduanData['visibilitas'];
+              _defaultPengaduan = pengaduanData['id_jenispengaduan'];
+
+              _isLoaded=true;
             }
 
             return Scaffold(
@@ -216,7 +251,7 @@ class _FormPengaduanState extends State<FormPengaduan> {
                               const Text('*', style: TextStyle(color: Colors.red),),
                             ],
                           ),
-                          DropdownData(onChanged: (value) => updateFormData('visibilitas', value)),
+                          DropdownData(onChanged: (value) => updateFormData('visibilitas', value),defaultselectedValue: _defaultPrivasi),
                         ],
                       )
                   ),
@@ -230,7 +265,7 @@ class _FormPengaduanState extends State<FormPengaduan> {
                               const Text('*', style: TextStyle(color: Colors.red)),
                             ],
                           ),
-                          DropdownData(onChanged: (value) => updateFormData('jenis_pengaduan', value),endpoint: 'jenis_pengaduan',),
+                          DropdownData(onChanged: (value) => updateFormData('jenis_pengaduan', value),endpoint: 'jenis_pengaduan',defaultselectedValue: _defaultPengaduan,),
                         ],
                       )
                   ),
@@ -314,8 +349,9 @@ class _FormPengaduanState extends State<FormPengaduan> {
 class DropdownData extends StatefulWidget {
   final Function(String?) onChanged;
   final String endpoint;
+  final String? defaultselectedValue;
 
-  const DropdownData({super.key, required this.onChanged, this.endpoint = 'visibilitas'});
+  const DropdownData({super.key, required this.onChanged, this.endpoint = 'visibilitas', this.defaultselectedValue});
 
   @override
   _DropdownDataState createState() => _DropdownDataState();
@@ -331,14 +367,18 @@ class _DropdownDataState extends State<DropdownData> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    fetchData(widget.defaultselectedValue);
   }
 
-  void fetchData() async {
+  void fetchData(defValue) async {
     try {
       var result = await DataFetch.getPublicData(endpoint: widget.endpoint);
       if (result != null && result['data'] != null) {
         setState(() {
+          if(defValue !=null) {
+            _selectedValue = defValue;
+            widget.onChanged(_selectedValue);
+          }
           _dataList = List<Map<String, dynamic>>.from(result['data']);
         });
       }
@@ -360,6 +400,7 @@ class _DropdownDataState extends State<DropdownData> {
   }
 
   OverlayEntry _createOverlayEntry() {
+
     return OverlayEntry(
       builder: (context) => Positioned(
         width: MediaQuery.of(context).size.width - 40, // Adjust width as necessary
@@ -385,8 +426,7 @@ class _DropdownDataState extends State<DropdownData> {
                     _toggleDropdown();
                   },
                 ),
-              )
-                  .toList(),
+              ).toList(),
             ),
           ),
         ),
