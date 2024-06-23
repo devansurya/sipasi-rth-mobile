@@ -45,6 +45,7 @@ class _DashboardAppBarWidgetState extends State<DashboardAppBarWidget> {
                       Text(
                         _userName,
                         style: const TextStyle(color: Colors.black),
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(width: 3),
                       const Icon(Icons.arrow_drop_down, color: Colors.black),

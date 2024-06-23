@@ -164,10 +164,7 @@ class DataFetch {
 
   static Future<dynamic> getPublicData({required String endpoint}) async {
     try {
-      log(endpoint);
       String baseUrl = await getBaseUrl();
-
-
       final response = await http.get(Uri.parse('${baseUrl}public/$endpoint'));
 
       if(response.statusCode == 200) {
@@ -202,7 +199,7 @@ class DataFetch {
         return data;
       }
       else if (response.statusCode == 401) {
-
+        return 'relog';
       }
       else{
         throw Exception('Failed to fetch data :  '+jsonDecode(response.body)['error']);
@@ -219,6 +216,28 @@ class DataFetch {
       msg: error,
       backgroundColor: Colors.grey,
     );
+  }
+  static Future<dynamic> delete({required String endpoint, String param=''}) async {
+    String token = await getToken();
+    String baseUrl = await getBaseUrl();
+    // Define the headers with the token
+    Map<String, String> requestHeaders = {
+      'Authorization': 'Bearer $token',
+    };
+
+    param = '?$param' ?? '';
+    final response = await http.delete(Uri.parse('$baseUrl$endpoint$param'), headers: requestHeaders);
+
+    if(response.statusCode == 200) {
+      final data = jsonDecode(response.body) as Map<String, dynamic>;
+      return data;
+    }
+    else if (response.statusCode == 401) {
+      return 'relog';
+    }
+    else{
+      throw Exception('Failed to fetch data :  '+jsonDecode(response.body)['error']);
+    }
   }
 
   static Future<dynamic> relog(BuildContext context) async{

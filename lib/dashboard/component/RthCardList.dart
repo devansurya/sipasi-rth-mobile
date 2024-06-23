@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:sipasi_rth_mobile/dashboard/component/ImageApi.dart';
+import 'package:sipasi_rth_mobile/helper/Helper.dart';
 import 'package:sipasi_rth_mobile/public/login.dart';
 import '../../api/data.dart';
 import 'package:flutter/material.dart';
@@ -20,6 +21,7 @@ class GetCard extends StatelessWidget {
         elevation: 4.0,
         key: ValueKey<String>(element['id_rth']),
         surfaceTintColor: Colors.white,
+        color: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -108,7 +110,7 @@ class GetCard extends StatelessWidget {
       future: DataFetch.getRthData(''),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Helper.circleIndicator();
         } else if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

@@ -12,10 +12,10 @@ class DashboardView extends State<Rth> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(16.0, 0.0, 16.0, 0.0),
-        child: GetCard(),
+        backgroundColor: Colors.grey[200],
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 5),
+          child: GetCard(),
       )
     );
   }

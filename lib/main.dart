@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:sipasi_rth_mobile/helper/database.dart';
 import 'package:sipasi_rth_mobile/public/login.dart';
-import 'dashboard/index.dart';
+import 'dashboard/Index.dart';
 import 'api/data.dart';
 import 'app_state.dart';
 import 'package:flutter/services.dart';

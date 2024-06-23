@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:sipasi_rth_mobile/api/data.dart';
-import 'package:sipasi_rth_mobile/dashboard/component/pengaduanitem.dart';
+import 'package:sipasi_rth_mobile/dashboard/component/Pengaduanitem.dart';
 
 import '../../helper/Helper.dart';
 
@@ -59,7 +59,7 @@ class _PengaduanState extends State<Pengaduan> {
               statusId: data['id_status_pengaduan'],
               lokasi: data['lokasi'],
               visibilitas: data['visibilitas'],
-              rth: data['nama_rth'],
+              rth: data['nama_rth'] ?? '',
               statusPublish: data['status_publish'],
             );
             listItem.add(item);
