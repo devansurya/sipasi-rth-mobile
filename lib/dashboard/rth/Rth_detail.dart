@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:sipasi_rth_mobile/dashboard/Reservasi/FormReservasi.dart';
 import 'package:sipasi_rth_mobile/dashboard/component/AlertWidget.dart';
 import 'package:sipasi_rth_mobile/dashboard/component/ImageApi.dart';
 import 'package:sipasi_rth_mobile/helper/Helper.dart';
@@ -45,7 +46,7 @@ class _RthDetailState extends State<RthDetail>{
                 Visibility(
                     visible: dataItem['status_reservasi'] == '1' ? true : false,
                     child: ElevatedButton(
-                      onPressed: () async => Navigator.push(context, MaterialPageRoute(builder: (context) => const FormPengaduan())),
+                      onPressed: () async => Navigator.push(context, MaterialPageRoute(builder: (context) => FormReservasi(idRth: dataItem['id_rth']))),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.lightGreen,
                         surfaceTintColor: Colors.white,

@@ -290,5 +290,65 @@ class DataFetch {
     return result;
 
   }
+
+  ///use idRth for create, idReservasi for edit
+  static Future<Map<String,dynamic>> getDetailReservasi({String? idReservasi, String? idRth}) async {
+
+    String token = await getToken();
+    String baseUrl = await getBaseUrl();
+
+
+    // Define the headers with the token
+    Map<String, String> requestHeaders = {
+      'Authorization': 'Bearer $token',
+    };
+
+    Map<String, dynamic> dataReservasi = {};
+    Map<String, dynamic> dataRth = {};
+    Map<String, dynamic> dataJenis = await getPublicData(endpoint: 'Jenis_reservasi');
+    Map<String, dynamic> dataStatus = await getPublicData(endpoint: 'Status_reservasi');
+
+
+    if(idReservasi != null) {
+      try{
+        ///get data reservasi
+        final response = await http.get(Uri.parse('${baseUrl}Reservasi/?id_reservasi=$idReservasi'), headers: requestHeaders);
+        if(response.statusCode != 200) throw Exception('Failed to fetch data : ${jsonDecode(response.body)['error']}');
+
+        final fullReservasiData = jsonDecode(response.body) as Map<String, dynamic>;
+        dataReservasi = fullReservasiData['data'];
+      }
+      catch(error) {
+        showError(error.toString());
+      }
+    }
+
+    final idRthParam  = dataReservasi['id_rth'] ?? idRth;
+
+    if(idRth != null) {
+      try {
+        final idRthParam  = dataRth['id_rth'] ?? idRth;
+        final responseRth = await http.get(Uri.parse('${baseUrl}Rth/?id_rth=$idRthParam'), headers: requestHeaders);
+        if(responseRth.statusCode != 200) throw Exception('Failed to fetch data : ${jsonDecode(responseRth.body)['error']}');
+
+        final fullRthData = jsonDecode(responseRth.body) as Map<String, dynamic>;
+        dataRth = fullRthData['data'][0];
+
+      }
+      catch(error) {
+        showError(error.toString());
+      }
+    }
+
+    Map<String, dynamic> dataFasilitas = await getPublicData(endpoint: 'Fasilitas_reservasi?id_rth=$idRthParam');
+
+    return {
+      'reservasi' : dataReservasi,
+      'rth' : dataRth,
+      'fasilitas' : dataFasilitas,
+      'jenis' : dataJenis,
+      'status' : dataStatus,
+    };
+  }
 }
 
