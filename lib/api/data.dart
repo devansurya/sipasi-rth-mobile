@@ -305,8 +305,11 @@ class DataFetch {
 
     Map<String, dynamic> dataReservasi = {};
     Map<String, dynamic> dataRth = {};
+    Map<String, dynamic> dataUser = {};
     Map<String, dynamic> dataJenis = await getPublicData(endpoint: 'Jenis_reservasi');
     Map<String, dynamic> dataStatus = await getPublicData(endpoint: 'Status_reservasi');
+    String? userData = await DB.instance.getSetting('UserData');
+    Map<String, dynamic> decodedUserData = jsonDecode(userData!);
 
 
     if(idReservasi != null) {
@@ -325,9 +328,19 @@ class DataFetch {
 
     final idRthParam  = dataReservasi['id_rth'] ?? idRth;
 
-    if(idRth != null) {
+
+    final idUser =  dataReservasi['id_user'] ?? decodedUserData['id_user'];
+
+    if(idUser != null) {
+      final responseUser = await http.get(Uri.parse('${baseUrl}User/?id_user=$idUser'), headers: requestHeaders);
+      if(responseUser.statusCode != 200) throw Exception('Failed to fetch data : ${jsonDecode(responseUser.body)['error']}');
+
+      final fullUserData = jsonDecode(responseUser.body) as Map<String, dynamic>;
+      dataUser = fullUserData['data'];
+    }
+
+    if(idRthParam != null) {
       try {
-        final idRthParam  = dataRth['id_rth'] ?? idRth;
         final responseRth = await http.get(Uri.parse('${baseUrl}Rth/?id_rth=$idRthParam'), headers: requestHeaders);
         if(responseRth.statusCode != 200) throw Exception('Failed to fetch data : ${jsonDecode(responseRth.body)['error']}');
 
@@ -347,6 +360,7 @@ class DataFetch {
       'rth' : dataRth,
       'fasilitas' : dataFasilitas,
       'jenis' : dataJenis,
+      'user' : dataUser,
       'status' : dataStatus,
     };
   }

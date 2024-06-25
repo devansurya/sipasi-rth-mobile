@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:sipasi_rth_mobile/public/login.dart';
 import '../../helper/database.dart';
 
 class DashboardAppBarWidget extends StatefulWidget {
@@ -39,33 +41,29 @@ class _DashboardAppBarWidgetState extends State<DashboardAppBarWidget> {
             children: [
               Image.asset('assets/icons/logo.png', height: 50),
               DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  icon: Row(
-                    children: [
-                      Text(
-                        _userName,
-                        style: const TextStyle(color: Colors.black),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(width: 3),
-                      const Icon(Icons.arrow_drop_down, color: Colors.black),
-                    ],
+                child: DropdownButton2<String>(
+                  hint: Text(
+                    _userName,
+                    style: const TextStyle(color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  items: const <DropdownMenuItem<String>>[
+                  items: <DropdownMenuItem<String>>[
                     DropdownMenuItem<String>(
                       value: 'logout',
                       child: Text('Logout'),
+                      onTap: () {
+                      },
                     ),
                   ],
                   onChanged: (String? value) {
                     if (value == 'logout') {
-                      // Handle logout
                       print('User logged out');
+                      // Navigator.push(context, MaterialPageRoute(builder: (context) => LoginView()));
+                      Navigator.popUntil(context, (route) => route.isFirst);
                     }
                   },
                 ),
               ),
-              const SizedBox(width: 8),
             ],
           ),
         ),

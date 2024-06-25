@@ -55,8 +55,9 @@ class LoginLayout extends State<LoginView> {
       }
       final data = DataFetch();
       final response = await data.login(email: emailController.text, pass: passController.text);
-      log(jsonEncode(response));
       if (response != null && response['code'] == 200) {
+        emailController.text = '';
+        passController.text = '';
         Navigator.push(context, MaterialPageRoute(builder: (context) => const Index()));
       } else {
         Fluttertoast.showToast(

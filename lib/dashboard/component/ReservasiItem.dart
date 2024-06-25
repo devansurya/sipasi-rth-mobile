@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sipasi_rth_mobile/dashboard/Reservasi/DetailReservasi.dart';
+import 'package:sipasi_rth_mobile/dashboard/Reservasi/FormReservasi.dart';
 
 import '../../helper/CustomTheme.dart';
 import '../../helper/Helper.dart';
@@ -54,6 +55,14 @@ class ReservasiItem extends StatelessWidget {
             _buildInfoRow('Tanggal Reservasi:', Helper.formatDate(tanggalReservasi, fromFormat: 'yyyy-MM-dd'), context),
             _buildInfoRow('Jenis Reservasi:', jenis, context),
             const Divider(),
+            const Text(
+              'Tujuan Reservasi :',
+              style: TextStyle(
+                fontSize: 14,
+                color: CustomTheme.textPrimaryColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             Text(
               deskripsi,
               style: const TextStyle(
@@ -62,18 +71,17 @@ class ReservasiItem extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
-              'Lokasi:',
-              style: TextStyle(
-                fontSize: 14,
-                color: CustomTheme.textPrimaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
             const Divider(),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
+                if(idStatusReservasi == '1') Helper.button(
+                  "Edit ",
+                  callback: () => _openEdit(context, id),
+                  icon: FontAwesomeIcons.pencil,
+                  type: 'info',
+                ),
+                SizedBox(width: 5),
                 Helper.button(
                   "Detail ",
                   callback: () => _openDetails(context, id),
@@ -125,4 +133,9 @@ class ReservasiItem extends StatelessWidget {
   _openDetails(BuildContext context, String id) {
     Navigator.push(context, MaterialPageRoute(builder: (context) => DetailReservasi(idReservasi: id)));
   }
+
+  _openEdit(BuildContext context, String id) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => FormReservasi(idReservasi: id)));
+  }
+
 }
