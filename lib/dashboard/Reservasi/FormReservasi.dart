@@ -2,6 +2,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:sipasi_rth_mobile/api/data.dart';
 import 'package:sipasi_rth_mobile/helper/CustomTheme.dart';
 
@@ -14,8 +16,8 @@ class FormReservasi extends StatefulWidget {
   TextEditingController namaController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController nomorController = TextEditingController();
+  TextEditingController dateController = TextEditingController();
   TextEditingController tujuanController = TextEditingController();
-
   FormReservasi({super.key, this.idReservasi, this.idRth});
   
   @override
@@ -24,14 +26,17 @@ class FormReservasi extends StatefulWidget {
 
 class _FormReservasiState extends State<FormReservasi> {
 
+  late Future<dynamic> _myFuture;
+
   @override
   void initState() {
     super.initState();
+    _myFuture = DataFetch.getDetailReservasi(idReservasi: widget.idReservasi,idRth: widget.idRth);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: DataFetch.getDetailReservasi(idReservasi: widget.idReservasi,idRth: widget.idRth), builder: (context, snapshot){
+    return FutureBuilder(future: _myFuture, builder: (context, snapshot){
       if (snapshot.connectionState == ConnectionState.waiting) {
         return Helper.circleIndicator();
       } else if (snapshot.hasError) {
@@ -90,24 +95,44 @@ class _FormReservasiState extends State<FormReservasi> {
             useBaseUrl: true,
           ),
         ),
-        _textRow(text: 'Nama pemesan',controller: widget.namaController)
+        Padding(padding: EdgeInsets.symmetric(vertical: 10), child: Row(children: [FaIcon(FontAwesomeIcons.mapPin,size: 14,), Text(dataRth['alamat'])],),),
+        _textRow(text: 'Nama pemesan',controller: widget.namaController),
+        _textRow(text: 'Email ',controller: widget.namaController),
+        _textRow(text: 'No Telp ',controller: widget.nomorController, type: TextInputType.number),
+        _textRow(text: 'Tanggal Reservasi',controller: widget.dateController, type: TextInputType.datetime,isReadOnly: true ,callback: () {_showDate(context);}),
+        _textRow(text: 'Deskripsi',controller: widget.tujuanController, type: TextInputType.multiline, max: 5, min: 3),
       ],
     );
   }
 
-  Widget _textRow({required String text, bool isReadOnly = false, required TextEditingController controller, bool isRequired=true}) {
+  Widget _textRow({required String text, bool isReadOnly = false, required TextEditingController controller, bool isRequired=true, TextInputType type = TextInputType.text, Function? callback, int max = 1, int min=1}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 5),
       child: Column(
         children: [
           Row(children: [
-            Text(text, style: const TextStyle(color: CustomTheme.textPrimaryColor, fontWeight: FontWeight.bold)),
+            Text(text, style: const TextStyle(color: CustomTheme.textPrimaryColor, fontWeight: FontWeight.bold),),
             if(isRequired) const Text('*', style: TextStyle(color: Colors.red))
           ]),
-          TextField(controller: controller,readOnly: isReadOnly, decoration: InputDecoration(labelText: text),)
+          TextField(controller: controller,readOnly: isReadOnly, decoration: InputDecoration(labelText: text),maxLines: max,minLines: min, keyboardType: type, onTap: () {
+           if(callback != null) {
+             callback();
+           }
+          })
         ],
       ),
     );
   }
 
+  void _showDate(context) async{
+    DateTime? pickedDate = await showDatePicker(context: context, firstDate: DateTime.now(), currentDate: DateTime.now(), lastDate: DateTime(2101));
+    String formattedDate = 'yyyy-MM-dd';
+    if(pickedDate != null) {
+      formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+    }
+    setState(() {
+      widget.dateController.text = formattedDate; //set foratted date to TextField value.
+    });
+
+  }
 }
