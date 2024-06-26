@@ -1,7 +1,11 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sipasi_rth_mobile/api/data.dart';
 import 'package:sipasi_rth_mobile/dashboard/component/ReservasiItem.dart';
 
+import '../../app_state.dart';
 import '../../helper/Helper.dart';
 
 class Reservasi extends StatefulWidget {
@@ -10,6 +14,18 @@ class Reservasi extends StatefulWidget {
 }
 
 class _ReservasiState  extends State<Reservasi> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appState = Provider.of<AppState>(context, listen: false);
+      appState.setFilterCallback(() {
+
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(future: DataFetch.get(endpoint: 'Reservasi'), builder: (context, snapshot) => builder(context, snapshot));

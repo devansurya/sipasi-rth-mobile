@@ -19,6 +19,8 @@ class Index extends StatefulWidget {
 }
 
 class _IndexView extends State<Index> {
+  late var appState;
+  @override
   static final List<Widget> _widgetOptions = <Widget>[
     const Rth(),
     const Pengaduan(),
@@ -26,13 +28,24 @@ class _IndexView extends State<Index> {
     Reservasi(),
     const Profile()
   ];
+
+  static final List<bool> _useFilter = [
+    true,
+    true,
+    false,
+    true,
+    false
+  ];
+
   int _selectedIndex = 2;
 
-  void _onItemTapped(index) {
+  void _onItemTapped(index, appState) {
+    appState.updateFilter(_useFilter[index]);
     setState(() {
       _selectedIndex = index;
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -85,7 +98,7 @@ class _IndexView extends State<Index> {
             ),
           ],
           currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
+          onTap: (index) {_onItemTapped(index, appState);},
         ),
         ),
     );

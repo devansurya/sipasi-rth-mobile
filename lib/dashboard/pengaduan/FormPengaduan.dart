@@ -68,7 +68,7 @@ class _FormPengaduanState extends State<FormPengaduan> {
         final String method = idPengaduan != null ? 'PATCH' : 'POST' ;
         var response = await DataFetch.sendData(endpoint: 'Pengaduan',formData: formdata,file: _file, method: method);
         if(response != null) {
-          Navigator.pop(context, response);
+          Navigator.pop(context, true);
         }
       }
   }

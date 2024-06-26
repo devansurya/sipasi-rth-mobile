@@ -1,9 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sipasi_rth_mobile/api/data.dart';
 import 'package:sipasi_rth_mobile/dashboard/component/Pengaduanitem.dart';
 
+import '../../app_state.dart';
 import '../../helper/Helper.dart';
 
 class Pengaduan extends StatefulWidget {
@@ -17,6 +19,12 @@ class _PengaduanState extends State<Pengaduan> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appState = Provider.of<AppState>(context, listen: false);
+      appState.setFilterCallback(() {
+
+      });
+    });
   }
 
 
