@@ -43,6 +43,7 @@ class MyApp extends StatelessWidget {
           fontFamily: 'Urbanist',
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green, background: Colors.white),
           useMaterial3: true,
+            bottomSheetTheme:  const BottomSheetThemeData(backgroundColor: Colors.white)
         ),
         home: _defaultView(isLoggedIn),
       )

@@ -77,7 +77,7 @@ class _IndexView extends State<Index> {
           ),
           items: const <BottomNavigationBarItem>[
             BottomNavigationBarItem(
-              icon: FaIcon(FontAwesomeIcons.clipboardList),
+              icon: FaIcon(FontAwesomeIcons.tree),
               label: 'Rth',
             ),
             BottomNavigationBarItem(

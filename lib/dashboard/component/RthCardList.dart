@@ -1,18 +1,26 @@
 import 'dart:developer';
 
+import 'package:provider/provider.dart';
 import 'package:sipasi_rth_mobile/dashboard/component/ImageApi.dart';
 import 'package:sipasi_rth_mobile/helper/Helper.dart';
 import 'package:sipasi_rth_mobile/public/login.dart';
 import '../../api/data.dart';
 import 'package:flutter/material.dart';
+import '../../app_state.dart';
+import '../../helper/CustomTheme.dart';
 import '../rth/Rth_detail.dart';
 
-class GetCard extends StatelessWidget {
-  // final List<Map> data;
+class RthCardList extends StatefulWidget {
+  const RthCardList({super.key});
+  @override
+  createState() => _RthCardListState();
+}
 
-  final data = DataFetch();
+class _RthCardListState extends State<RthCardList> {
+  late Future<dynamic> _myFuture;
+  bool _filterIsActive = true;
+  bool _filterIsNotActive = true;
 
-  GetCard({super.key});
   List<Widget> getCard(List<Map> data, BuildContext context) {
     List<Column> rows = [];
 
@@ -104,10 +112,163 @@ class GetCard extends StatelessWidget {
     return rows;
   }
 
+  void _showFilter(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        const Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Status Reservasi',
+                              style: TextStyle(
+                                color: CustomTheme.textPrimaryColor,
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _filterIsActive = !_filterIsActive;
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  Checkbox(
+                                    value: _filterIsActive,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _filterIsActive = value ?? false;
+                                      });
+                                    },
+                                  ),
+                                  const Text(
+                                    'Aktif',
+                                    style: TextStyle(
+                                      color: CustomTheme.textSecondaryColor,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _filterIsNotActive = !_filterIsNotActive;
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  Checkbox(
+                                    value: _filterIsNotActive,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _filterIsNotActive = value ?? false;
+                                      });
+                                    },
+                                  ),
+                                  const Text(
+                                    'Tidak Aktif',
+                                    style: TextStyle(
+                                      color: CustomTheme.textSecondaryColor,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Helper.button(
+                            'Filter',
+                            callback: () {
+                              // Implement your filter logic here
+                              _getData();
+                              Navigator.pop(context); // Close the bottom sheet
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _getData() async{
+
+    String param = '?';
+
+    if(_filterIsActive || _filterIsNotActive) {
+      param += 'statuses=';
+    }
+
+    if(_filterIsActive) {
+      param +='1';
+      if(_filterIsNotActive) {
+        param +=',';
+      }
+    }
+    if(_filterIsNotActive) {
+      param +='"0"';
+    }
+    log(param);
+    setState(() {
+      _myFuture = DataFetch.getRthData(param);
+    });
+
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _myFuture = DataFetch.getRthData('');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final appState = Provider.of<AppState>(context, listen: false);
+      appState.setFilterCallback(() {
+        _showFilter(context);
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: DataFetch.getRthData(''),
+      future: _myFuture,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Helper.circleIndicator();
@@ -117,7 +278,6 @@ class GetCard extends StatelessWidget {
           return const Center(child: Text('No data available'));
         }
         else {
-
           if(snapshot.data == 'relog') {
             Navigator.push(context, MaterialPageRoute(builder: (context) => LoginView()));
           }

@@ -1,7 +1,19 @@
 
+import 'dart:developer';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:expansion_tile_card/expansion_tile_card.dart';
+import 'package:sipasi_rth_mobile/api/data.dart';
+import 'package:sipasi_rth_mobile/dashboard/pengaduan/DetailPengaduan.dart';
+import 'package:sipasi_rth_mobile/helper/CustomTheme.dart';
+
+import '../dashboard/component/ImageApi.dart';
+import '../dashboard/rth/Rth_detail.dart';
+import '../helper/Helper.dart';
+import 'login.dart';
 
 class Home extends StatelessWidget {
   bool useAppbar = true;
@@ -69,6 +81,8 @@ class _HomeList extends State<HomeListElements>{
         children: const <Widget>[
           InfoCard(),
           RthInfo(),
+          RTHCarousel(),
+          PengaduanCarousel(),
           PrivacyInfo(),
           FAQ()
         ],
@@ -123,40 +137,38 @@ class InfoCard extends StatelessWidget {
 class RthInfo extends StatelessWidget {
   const RthInfo({super.key});
 
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(20),
+  Widget _getResult ({String? countRth, String? countPengaduan, String? countReservasi}) {
+    return Padding(
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('Jaga hijau kita!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.left,),
-          Text('Reservasi mudah, Pengaduan cepat!', style: TextStyle(fontWeight: FontWeight.w300),textAlign: TextAlign.left,),
+          const Text('Jaga hijau kita!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.left,),
+          const Text('Reservasi mudah, Pengaduan cepat!', style: TextStyle(fontWeight: FontWeight.w300),textAlign: TextAlign.left,),
           Padding(
-            padding: EdgeInsets.only(top: 30,left: 20, right: 20),
+            padding: const EdgeInsets.only(top: 30,left: 20, right: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Expanded(child: Column(
                   children: <Widget>[
-                    FaIcon(FontAwesomeIcons.house, size: 30),
-                    Text('10'),
-                    Text('RTH')
+                    const FaIcon(FontAwesomeIcons.tree, size: 30),
+                    Text(countRth ?? '0'),
+                    const Text('RTH')
                   ],
                 )),
                 Expanded(child: Column(
                   children: <Widget>[
-                    FaIcon(FontAwesomeIcons.addressCard, size: 30),
-                    Text('10'),
-                    Text('Pengaduan')
+                    const FaIcon(FontAwesomeIcons.triangleExclamation, size: 30),
+                    Text(countPengaduan ?? '0'),
+                    const Text('Pengaduan')
                   ],
                 )),
                 Expanded(child: Column(
                   children: <Widget>[
-                    FaIcon(FontAwesomeIcons.addressCard, size: 30),
-                    Text('20'),
-                    Text('Reservasi')
+                    const FaIcon(FontAwesomeIcons.calendarCheck, size: 30),
+                    Text(countReservasi ?? '0'),
+                    const Text('Reservasi')
                   ],
                 )),
               ],
@@ -165,6 +177,22 @@ class RthInfo extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(future: DataFetch.getPublicData(endpoint: 'summary'), builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return _getResult();
+      } else if (snapshot.hasError) {
+        return _getResult();
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return _getResult();
+      }
+      var data = snapshot.data['data'];
+      var summary = data['count'] ?? {};
+      return _getResult(countRth:summary['rth'].toString(),countPengaduan: summary['pengaduan'].toString(),countReservasi: summary['reservasi'].toString());
+    });
   }
 }
 class PrivacyInfo extends StatelessWidget {
@@ -192,7 +220,7 @@ class PrivacyInfo extends StatelessWidget {
           ),
           const Padding(
             padding: EdgeInsets.all(10.0),
-            child: Text('AMAN TIDAK YA?', style: TextStyle(color: Colors.green)),
+            child: Text('AMAN TIDAK YA?', style: TextStyle(color: CustomTheme.textActiveColor)),
           ),
           const Padding(
             padding: EdgeInsets.all(10.0),
@@ -265,7 +293,7 @@ class FAQ extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('FAQ', style: TextStyle(color: Colors.green)),
+            Text('FAQ', style: TextStyle(color: CustomTheme.textActiveColor)),
             Text(
               'Tidak Menemukan Jawaban?',
               style: TextStyle(
@@ -334,4 +362,298 @@ class FAQ extends StatelessWidget {
     );
   }
 
+}
+class RTHCarousel extends StatelessWidget {
+  const RTHCarousel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(future: DataFetch.getPublicData(endpoint: 'rth'), builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Helper.circleIndicator();
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}'));
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return const Center(child: Text('No data available'));
+      }
+      else {
+        var data = snapshot.data['data'];
+        if(data == 'relog') {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView()));
+        }
+
+        final parsedData = List<Map<dynamic, dynamic>>.from(data);
+        final widget = getCard(parsedData, context);
+        return Container(
+          color: const Color.fromRGBO(238, 246, 241, 1),
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text('Ruang terbuka Hijau', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.left,),
+              ),
+              FlutterCarousel(items: widget, options: CarouselOptions(autoPlay: true,height: 430,enableInfiniteScroll: true)),
+            ],
+          ),
+        );
+      }
+    });
+  }
+
+  List<Widget> getCard(List<Map> data, BuildContext context) {
+    List<Column> rows = [];
+
+    for (var element in data) {
+      Card card = Card(
+        elevation: 4.0,
+        key: ValueKey<String>(element['id_rth']),
+        surfaceTintColor: Colors.white,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        margin: const EdgeInsets.all(8.0), // Added margin for better spacing
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start, // Align children to the start
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(10.0)),
+              child: ImageApi(
+                Url: element['foto_rth'],
+                defaultImage: "assets/images/default-card.jpg",
+                useBaseUrl: true,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Adjusted padding
+              child: GestureDetector(
+                onTap: () {
+                  final String key = element['id_rth'];
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => RthDetail(idRth: key,)));
+                },
+                child: Text(
+                  element['nama_rth'],
+                  style: const TextStyle(
+                    fontSize: 18.0, // Increased font size for the title
+                    fontWeight: FontWeight.bold,
+                    color: CustomTheme.textPrimaryColor, // Improved color for better readability
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1, // Ensure the title stays on one line
+                  semanticsLabel: 'Title', // Accessibility label
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // Adjusted padding
+              child: Text(
+                element['deskripsi_rth'],
+                style: const TextStyle(
+                  fontSize: 14.0, // Slightly smaller font size for the description
+                  color: CustomTheme.textPrimaryColor, // Use a lighter color for the description
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                semanticsLabel: 'Description', // Accessibility label
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      final String key = element['id_rth'];
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => RthDetail(idRth: key,)));
+                    },
+                    child: const Text(
+                      'Selengkapnya..',
+                      style: TextStyle(color: CustomTheme.textActiveColor), // Button text color
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+      Column column = Column(
+        children: [
+          Padding(padding: const EdgeInsets.all(0.0),child: card),
+        ],
+      );
+
+      rows.add(column);
+    }
+    return rows;
+  }
+
+
+}
+class PengaduanCarousel extends StatelessWidget {
+  const PengaduanCarousel({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(future: DataFetch.getPublicData(endpoint: 'pengaduan'), builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Helper.circleIndicator();
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error: ${snapshot.error}'));
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return const Center(child: Text('No data available'));
+      }
+      else {
+        var data = snapshot.data['data'];
+        if(data == 'relog') {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView()));
+        }
+
+        final parsedData = List<Map<dynamic, dynamic>>.from(data);
+        final widget = getCard(parsedData, context);
+        return Container(
+          color: const Color.fromRGBO(238, 246, 241, 1),
+          child: Column(
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 10),
+                child: Text('Pengaduan Terbaru', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25),textAlign: TextAlign.left,),
+              ),
+              FlutterCarousel(items: widget, options: CarouselOptions(autoPlay: true,height: 500,enableInfiniteScroll: true)),
+            ],
+          ),
+        );
+      }
+    });
+  }
+
+  List<Widget> getCard(List data, BuildContext context) {
+    List<Column> rows = [];
+
+    for (var element in data) {
+
+      Card card = Card(
+        elevation: 4.0,
+        key: ValueKey<String>(element['id_pengaduan']),
+        surfaceTintColor: Colors.white,
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        margin: const EdgeInsets.all(8.0), // Added margin for better spacing
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start, // Align children to the start
+          children: <Widget>[
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(10.0)),
+              child: ImageApi(
+                Url: element['foto'],
+                defaultImage: "assets/images/default-card.jpg",
+                useBaseUrl: true,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Adjusted padding
+              child: Text(
+                "- ${element['jenis_pengaduan']}",
+                style: const TextStyle(
+                  fontSize: 15.0, // Increased font size for the title
+                  fontWeight: FontWeight.bold,
+                  color: CustomTheme.textActiveColor, // Improved color for better readability
+                ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1, // Ensure the title stays on one line
+                semanticsLabel: 'Title', // Accessibility label
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Adjusted padding
+              child: GestureDetector(
+                onTap: () {
+                  final String key = element['id_pengaduan'];
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPengaduan(idPengaduan: key)));
+                },
+                child: Text(
+                  element['subjek'],
+                  style: const TextStyle(
+                    fontSize: 18.0, // Increased font size for the title
+                    fontWeight: FontWeight.bold,
+                    color: CustomTheme.textPrimaryColor, // Improved color for better readability
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1, // Ensure the title stays on one line
+                  semanticsLabel: 'Title', // Accessibility label
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // Adjusted padding
+              child: Text(
+                element['deskripsi_pengaduan'],
+                style: const TextStyle(
+                  fontSize: 14.0, // Slightly smaller font size for the description
+                  color: CustomTheme.textPrimaryColor, // Use a lighter color for the description
+                ),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                semanticsLabel: 'Description', // Accessibility label
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0), // Adjusted padding
+              child:  Row(
+
+                children: [
+                  const FaIcon(FontAwesomeIcons.calendar,size: 14,),
+                  const SizedBox(width: 5,),
+                  Text(
+                    Helper.formatDate(element['create_date']),
+                    style: const TextStyle(
+                      fontSize: 14.0, // Slightly smaller font size for the description
+                      color: CustomTheme.textPrimaryColor, // Use a lighter color for the description
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    semanticsLabel: 'Date', // Accessibility label
+                  )
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  TextButton(
+                    onPressed: () {
+                      final String key = element['id_pengaduan'];
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => DetailPengaduan(idPengaduan: key)));
+                    },
+                    child: const Text(
+                      'Selengkapnya..',
+                      style: TextStyle(color: CustomTheme.textActiveColor), // Button text color
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+
+      Column column = Column(
+        children: [
+          Padding(padding: const EdgeInsets.all(0.0),child: card),
+        ],
+      );
+
+      rows.add(column);
+    }
+    return rows;
+  }
 }

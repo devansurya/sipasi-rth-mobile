@@ -181,6 +181,46 @@ class DataFetch {
     }
   }
 
+  static Future<dynamic> getUser({ String? id_user}) async{
+    try {
+      String endpoint = 'User';
+      String token = await getToken();
+      String baseUrl = await getBaseUrl();
+      // Define the headers with the token
+      Map<String, String> requestHeaders = {
+        'Authorization': 'Bearer $token',
+      };
+
+      if(id_user == null){
+        String? userData = await DB.instance.getSetting('UserData');
+        Map decodedUserData = jsonDecode(userData ?? '');
+        id_user = decodedUserData['id_user'];
+      }
+
+      String param = '?id_user=$id_user' ?? '';
+
+      log(param);
+
+
+      final response = await http.get(Uri.parse('$baseUrl$endpoint$param'), headers: requestHeaders);
+
+      if(response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        return data;
+      }
+      else if (response.statusCode == 401) {
+        return 'relog';
+      }
+      else{
+        throw Exception('Failed to fetch data :  '+jsonDecode(response.body)['error']);
+      }
+    }
+    catch(error) {
+      showError(error.toString());
+      throw Exception(error);
+    }
+  }
+
   static Future<dynamic> get({required String endpoint, String param=''}) async {
     try {
       String token = await getToken();

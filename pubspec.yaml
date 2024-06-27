@@ -52,6 +52,7 @@ dependencies:
   var_dump: any
   dropdown_button2: ^2.3.9
   easy_search_bar: ^2.5.0
+  flutter_carousel_widget: ^2.2.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
