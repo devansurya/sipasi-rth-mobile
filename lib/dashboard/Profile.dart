@@ -22,11 +22,8 @@ class Profile extends StatelessWidget {
       }
       else {
         if (snapshot.data == 'relog') {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => LoginView()));
-        }
-        Map data = snapshot.data['data'];
-
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginView()));}
+          Map data = snapshot.data['data'];
         return Scaffold(
           body: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -36,8 +33,7 @@ class Profile extends StatelessWidget {
                 const Center(
                   child: CircleAvatar(
                     radius: 100,
-                    backgroundImage: AssetImage(
-                        'assets/images/default-avatar.jpg'),
+                    backgroundImage: AssetImage('assets/images/default-avatar.jpg'),
                   ),
                 ),
                 Text(

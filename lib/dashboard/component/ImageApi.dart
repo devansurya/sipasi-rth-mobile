@@ -6,12 +6,14 @@ class ImageApi extends StatelessWidget {
   final String Url;
   String defaultImage = '';
   bool useBaseUrl = true;
+  BoxFit fit = BoxFit.cover;
   double? height;
 
   ImageApi({super.key, 
     required this.Url,
     this.useBaseUrl= true,
-    this.defaultImage = 'images/default',
+    this.fit= BoxFit.cover,
+    this.defaultImage = 'assets/images/default-card.jpg',
     this.height
   });
 
@@ -48,7 +50,7 @@ class ImageApi extends StatelessWidget {
       if(isValid) {
         return Image.network(
             snapshot.data?['Url'],
-            fit: BoxFit.cover,
+            fit: fit,
             height: height ?? 200,
             width: double.infinity,
         );
@@ -56,7 +58,7 @@ class ImageApi extends StatelessWidget {
       else {
         return Image.asset(
           defaultImage,
-          fit: BoxFit.cover,
+          fit: fit,
           height: 200,
           width: double.infinity,
         );

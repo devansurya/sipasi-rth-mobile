@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sipasi_rth_mobile/api/data.dart';
+import 'package:sipasi_rth_mobile/dashboard/Reservasi/BuktiReservasi.dart';
 import 'package:sipasi_rth_mobile/helper/CustomTheme.dart';
 
 import '../../helper/Helper.dart';
@@ -298,8 +299,6 @@ class DetailReservasi extends StatelessWidget {
                       ),
                     ),
                     const Divider(height: 5),
-
-                    ///Name
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 8.0, vertical: 4.0),
@@ -335,6 +334,15 @@ class DetailReservasi extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    if(data['id_status_reservasi'] == '2') Row(
+                     mainAxisAlignment: MainAxisAlignment.end,
+                     children: [
+                       Helper.button('Bukti Penerimaan', callback: () {
+                         Navigator.push(context, MaterialPageRoute(builder: (context) => BuktiReservasi(idReservasi: idReservasi)));
+                       }),
+                     ],
+                   ),
                     const SizedBox(height: 20)
                   ],
                 ),
