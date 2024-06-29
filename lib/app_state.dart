@@ -7,6 +7,7 @@ class AppState extends ChangeNotifier {
   String _page = 'Home';
   final String _username = '';
   bool _useFilter =false;
+  Map<String, dynamic> _userData = {};
 
   Function _filterCallback = () {};
 
@@ -15,9 +16,15 @@ class AppState extends ChangeNotifier {
   bool get useFilter => _useFilter;
   Function get filterCallback => _filterCallback;
 
+  Map<String, dynamic> get userData => _userData;
+
   void updateTitle(String newTitle) {
     _title = newTitle;
     notifyListeners();
+  }
+
+  void setUserData(Map<String, dynamic> userData) {
+    _userData = userData;
   }
 
   void updateFilter(bool useFilter) {

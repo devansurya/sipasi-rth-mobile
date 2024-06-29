@@ -2,9 +2,11 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sipasi_rth_mobile/dashboard/Index.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../api/data.dart';
+import '../app_state.dart';
 
 
 class LoginView extends StatefulWidget {
@@ -55,10 +57,12 @@ class LoginLayout extends State<LoginView> {
       }
       final data = DataFetch();
       final response = await data.login(email: emailController.text, pass: passController.text);
+      final appState = Provider.of<AppState>(context,listen: false);
       if (response != null && response['code'] == 200) {
         emailController.text = '';
         passController.text = '';
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const Index()));
+        appState.setUserData(response['data']['user']);
+        if (context.mounted) Navigator.push(context, MaterialPageRoute(builder: (context) => const Index()));
       } else {
         Fluttertoast.showToast(
           msg: 'Login failed. Please check your credentials.',
@@ -66,6 +70,7 @@ class LoginLayout extends State<LoginView> {
         );
       }
     } catch (error) {
+      log(error.toString());
       Fluttertoast.showToast(
         msg: error.toString().replaceAll('Exception: ', ''),
         backgroundColor: Colors.grey,

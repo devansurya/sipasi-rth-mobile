@@ -77,5 +77,32 @@ class Helper {
       ),
     );
   }
+  static Widget empty() {
+    return Container(
+      color: Colors.white,
+      child: Center(
+        child: Image.asset(
+          'assets/images/no-data.png', // Update this URL to the exact image URL if needed
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+  static void showSuccessSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        content: Row(
+          children: [
+            Icon(Icons.check_circle),
+            SizedBox(width: 10),
+            Text(message),
+          ],
+        ),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
 
 }

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sipasi_rth_mobile/dashboard/Reservasi/DetailReservasi.dart';
@@ -18,9 +20,12 @@ class ReservasiItem extends StatelessWidget {
   final String deskripsi;
   final String idStatusReservasi;
   final String statusBadgeColor;
+  final bool showEditButton;
+  final Function successCallback;
 
   ReservasiItem({
     super.key,
+    required this.showEditButton,
     required this.idRth,
     required this.nama,
     required this.id,
@@ -32,6 +37,7 @@ class ReservasiItem extends StatelessWidget {
     required this.idStatusReservasi,
     required this.statusBadgeColor,
     required this.tanggalReservasi,
+    required this.successCallback,
   });
 
   @override
@@ -75,7 +81,7 @@ class ReservasiItem extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if(idStatusReservasi == '1') Helper.button(
+                if(idStatusReservasi == '1' && showEditButton) Helper.button(
                   "Edit ",
                   callback: () => _openEdit(context, id),
                   icon: FontAwesomeIcons.pencil,
@@ -134,8 +140,13 @@ class ReservasiItem extends StatelessWidget {
     Navigator.push(context, MaterialPageRoute(builder: (context) => DetailReservasi(idReservasi: id)));
   }
 
-  _openEdit(BuildContext context, String id) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => FormReservasi(idReservasi: id)));
+  _openEdit(BuildContext context, String id)  async{
+    var data = await Navigator.push(context, MaterialPageRoute(builder: (context) => FormReservasi(idReservasi: id)));
+    log(data.toString());
+    if(data == 'Saving Successful') {
+      Helper.showSuccessSnackbar(context, 'Update Berhasil');
+      successCallback();
+    }
   }
 
 }

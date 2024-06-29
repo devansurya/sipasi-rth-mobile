@@ -46,6 +46,8 @@ class DataFetch {
           desc: 'Username from api',
           createDate: now
         );
+
+
         var userData = Setting(
             code: 'UserData',
             value: jsonEncode(data['data']['user']), // Assuming token is a String
@@ -67,7 +69,7 @@ class DataFetch {
     }
   }
 
-  static Future<dynamic> getRthData(String? param) async {
+  static Future<dynamic> getRthData(String? param, {bool usePublic = true}) async {
     try {
       String baseUrl = await getBaseUrl();
       // Fetch the token
@@ -78,7 +80,10 @@ class DataFetch {
       };
       param = param ?? '';
 
-      final response = await http.get(Uri.parse('${baseUrl}rth/$param'), headers: requestHeaders);
+      String public = usePublic ? 'public/' : '' ;
+      log('${baseUrl}${public}rth/$param');
+
+      final response = await http.get(Uri.parse('${baseUrl}${public}rth/$param'), headers: requestHeaders);
 
       if(response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -105,7 +110,6 @@ class DataFetch {
   static Future<bool> checkLogin() async {
     final Map<String?, Object?> token = await DB.instance.getFullSetting('userToken');
     final DateTime now = DateTime.now();
-    print(token);
     if(token['createDate'] == null) return false;
     final DateTime createDate = DateTime.parse(token['createDate'].toString()).add(const Duration(minutes: 60));
     final String? isRememberMe = await DB.instance.getSetting('UserIsRememberMe');
@@ -137,7 +141,7 @@ class DataFetch {
     formData.forEach((key, value) {
       request.fields[key] = value.toString(); // Convert all values to String
     });
-    log(request.toString());
+
 
     if(file != null) {
       request.files.add(await http.MultipartFile.fromPath('foto', file.path));
@@ -252,6 +256,7 @@ class DataFetch {
   }
   // error handler
   static void showError(String error) {
+
     Fluttertoast.showToast(
       msg: error,
       backgroundColor: Colors.grey,

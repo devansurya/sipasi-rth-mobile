@@ -7,6 +7,7 @@ import 'package:sipasi_rth_mobile/dashboard/component/ReservasiItem.dart';
 
 import '../../app_state.dart';
 import '../../helper/Helper.dart';
+import '../../public/login.dart';
 
 class Reservasi extends StatefulWidget {
   @override
@@ -14,10 +15,13 @@ class Reservasi extends StatefulWidget {
 }
 
 class _ReservasiState  extends State<Reservasi> {
+
+  late Future<dynamic> _myFuture;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _myFuture = DataFetch.get(endpoint: 'Reservasi');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appState = Provider.of<AppState>(context, listen: false);
       appState.setFilterCallback(() {
@@ -28,19 +32,27 @@ class _ReservasiState  extends State<Reservasi> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: DataFetch.get(endpoint: 'Reservasi'), builder: (context, snapshot) => builder(context, snapshot));
+    final appState = Provider.of<AppState>(context, listen: false);
+    return FutureBuilder(future: _myFuture, builder: (context, snapshot) => builder(context, snapshot, appState));
   }
 
-  Widget builder(context, snapshot) {
+  Widget builder(context, snapshot, appState) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return Helper.circleIndicator();
     } else if (snapshot.hasError) {
       return Center(child: Text('Error: ${snapshot.error}'));
     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-      return const Center(child: Text('No data available'));
+      return Helper.empty();
     }
     else {
-      final result = snapshot.data['data'];
+      if(snapshot.data == 'relog') {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => LoginView()));
+      }
+      final List result =  snapshot.data['data'];
+      final Map userdata = appState.userData;
+
+      if(result.isEmpty) return Helper.empty();
+
       final parsedData = List<Map<String, dynamic>>.from(result);
       List<Widget> listItem = [];
 
@@ -60,13 +72,14 @@ class _ReservasiState  extends State<Reservasi> {
         else if(data['id_status_reservasi'] == '4') {
           statusColor = 'error';
         }
-
-
+        bool _showEditDelete = false;
+        if(userdata['id_user'] == data['id_user']) _showEditDelete = true;
 
         Widget reservasiItem = ReservasiItem(
             idRth: data['id_rth'],
             nama: data['nama'] ?? '',
             id: data['id_reservasi'],
+            showEditButton: _showEditDelete,
             jenis: data['jenis_reservasi'],
             status: data['status'],
             tanggal: data['create_date'],
@@ -74,7 +87,8 @@ class _ReservasiState  extends State<Reservasi> {
             deskripsi: data['deskripsi_reservasi'],
             namaRth: data['nama_rth'],
             idStatusReservasi: data['id_status_reservasi'],
-            statusBadgeColor:statusColor
+            statusBadgeColor:statusColor,
+            successCallback : () => _updateData(),
         );
 
         listItem.add(reservasiItem);
@@ -87,5 +101,11 @@ class _ReservasiState  extends State<Reservasi> {
         ),
       );
     }
+  }
+
+  void _updateData() {
+    setState(() {
+      _myFuture = DataFetch.get(endpoint: 'Reservasi');
+    });
   }
 }

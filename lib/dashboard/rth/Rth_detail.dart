@@ -46,7 +46,12 @@ class _RthDetailState extends State<RthDetail>{
                 Visibility(
                     visible: dataItem['status_reservasi'] == '1' ? true : false,
                     child: ElevatedButton(
-                      onPressed: () async => Navigator.push(context, MaterialPageRoute(builder: (context) => FormReservasi(idRth: dataItem['id_rth']))),
+                      onPressed: () async {
+                        var data = await Navigator.push(context, MaterialPageRoute(builder: (context) => FormReservasi(idRth: dataItem['id_rth'])));
+                        if(data == 'Saving Successful') {
+                          Helper.showSuccessSnackbar(context, 'Update Berhasil');
+                        }
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.lightGreen,
                         surfaceTintColor: Colors.white,
@@ -142,7 +147,6 @@ class _RthDetailState extends State<RthDetail>{
   }
 
   void showSuccessAlert(data) {
-    print(data);
     Widget newAlert = const Padding(
         padding: EdgeInsets.only(top: 10, bottom: 10),
         child: ClipRRect(

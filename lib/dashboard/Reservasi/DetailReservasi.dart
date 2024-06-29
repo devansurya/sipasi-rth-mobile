@@ -1,8 +1,11 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:sipasi_rth_mobile/api/data.dart';
 import 'package:sipasi_rth_mobile/dashboard/Reservasi/BuktiReservasi.dart';
 import 'package:sipasi_rth_mobile/helper/CustomTheme.dart';
 
+import '../../app_state.dart';
 import '../../helper/Helper.dart';
 import '../component/ImageApi.dart';
 
@@ -19,13 +22,14 @@ class DetailReservasi extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context,listen: false);
     return FutureBuilder(
         future: DataFetch.get(
             endpoint: 'reservasi', param: 'id_reservasi=$idReservasi'),
-        builder: (context, snapshot) => _builder(context, snapshot));
+        builder: (context, snapshot) => _builder(context, snapshot, appState));
   }
 
-  Widget _builder(context, snapshot) {
+  Widget _builder(context, snapshot, appState) {
     if (snapshot.connectionState == ConnectionState.waiting) {
       return Helper.circleIndicator();
     } else if (snapshot.hasError) {
@@ -33,6 +37,8 @@ class DetailReservasi extends StatelessWidget {
     } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
       return const Center(child: Text('No data available'));
     } else {
+      Map<String, dynamic> userdata = appState.userData;
+
       Map<String, dynamic> data = snapshot.data['data'];
 
       String statusColor = 'info';
@@ -49,6 +55,7 @@ class DetailReservasi extends StatelessWidget {
       else if(data['id_status_reservasi'] == '4') {
         statusColor = 'error';
       }
+
       return Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: AppBar(
@@ -334,18 +341,42 @@ class DetailReservasi extends StatelessWidget {
                         ],
                       ),
                     ),
+                    if(data['catatan_petugas'] != null) Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 4.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                              child: Text('Catatan Petugas',
+                                  style: _primaryText,
+                                  textAlign: TextAlign.left)),
+                          Expanded(
+                              child: Text(
+                                  data['catatan_petugas'],
+                                  style: _secondaryText,
+                                  textAlign: TextAlign.left)),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 20),
-                    if(data['id_status_reservasi'] == '2') Row(
-                     mainAxisAlignment: MainAxisAlignment.end,
-                     children: [
-                       Helper.button('Bukti Penerimaan', callback: () {
-                         Navigator.push(context, MaterialPageRoute(builder: (context) => BuktiReservasi(idReservasi: idReservasi)));
-                       }),
-                     ],
-                   ),
+                    if(data['id_status_reservasi'] == '2') Padding(padding: EdgeInsets.symmetric(horizontal: 10),child: Helper.button(' Bukti Penerimaan ', callback: () {
+                     Navigator.push(context, MaterialPageRoute(builder: (context) => BuktiReservasi(idReservasi: idReservasi)));
+                    })),
                     const SizedBox(height: 20)
                   ],
                 ),
+              ),
+            ),
+            if(userdata['id_role'].toString() == '2') Padding(
+              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if(data['id_status_reservasi'] != '3') Helper.button('Tolak', type: 'error', callback: (){}),
+                  const SizedBox(width: 5,),
+                  if(data['id_status_reservasi'] != '2') Helper.button('Setujui', callback: (){}),
+                ],
               ),
             )
           ],

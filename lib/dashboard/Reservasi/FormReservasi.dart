@@ -42,7 +42,7 @@ class _FormReservasiState extends State<FormReservasi> {
 
   @override
   void initState() {
-    widget.tujuanController.text = 'YYYY/MM/DD';
+    widget.dateController.text = 'YYYY/MM/DD';
     super.initState();
     _myFuture = DataFetch.getDetailReservasi(idReservasi: widget.idReservasi,idRth: widget.idRth);
   }
@@ -159,7 +159,12 @@ class _FormReservasiState extends State<FormReservasi> {
   void _sendData(BuildContext context) async {
     bool _checkData = _validateData();
     final String method = widget.idReservasi != null ? 'PATCH' : 'POST' ;
+
     if(_checkData) {
+      if(widget.idReservasi != null) {
+        widget.formData['id_reservasi'] = widget.idReservasi;
+      }
+      log(widget.formData.toString());
       Map<String,dynamic> response = await DataFetch.sendData(formData: widget.formData, endpoint: 'Reservasi', method: method);
       if(response['code'] == 200) {
         Navigator.pop(context, 'Saving Successful');

@@ -20,6 +20,7 @@ class _RthCardListState extends State<RthCardList> {
   late Future<dynamic> _myFuture;
   bool _filterIsActive = true;
   bool _filterIsNotActive = true;
+  bool _showAll = false;
 
   List<Widget> getCard(List<Map> data, BuildContext context) {
     List<Column> rows = [];
@@ -122,7 +123,7 @@ class _RthCardListState extends State<RthCardList> {
             return Container(
               width: MediaQuery.of(context).size.width,
               child: Padding(
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -246,9 +247,8 @@ class _RthCardListState extends State<RthCardList> {
     if(_filterIsNotActive) {
       param +='"0"';
     }
-    log(param);
     setState(() {
-      _myFuture = DataFetch.getRthData(param);
+      _myFuture = DataFetch.getRthData(param,usePublic: false);
     });
 
   }
@@ -256,7 +256,7 @@ class _RthCardListState extends State<RthCardList> {
   @override
   void initState() {
     super.initState();
-    _myFuture = DataFetch.getRthData('');
+    _myFuture = DataFetch.getRthData('', usePublic: false);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final appState = Provider.of<AppState>(context, listen: false);
       appState.setFilterCallback(() {
@@ -283,6 +283,7 @@ class _RthCardListState extends State<RthCardList> {
           }
           // print(snapshot.data['data']);
           final result = snapshot.data['data'];
+          if(result.isEmpty) return Helper.empty();
           final parsedData = List<Map<dynamic, dynamic>>.from(result);
           // return getCard(result);
           return ListView(children: getCard(parsedData, context));
