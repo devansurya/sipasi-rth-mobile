@@ -2,6 +2,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
+/// Ini App level state
+/// bisa dipanggil dmn aja, kecuali saat build.
+/// Cth : final appState = Provider.of<AppState>(context);
 class AppState extends ChangeNotifier {
   String _title = 'Home';
   String _page = 'Home';

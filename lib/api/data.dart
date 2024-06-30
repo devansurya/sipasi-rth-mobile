@@ -237,6 +237,7 @@ class DataFetch {
       param = '?$param' ?? '';
 
       final response = await http.get(Uri.parse('$baseUrl$endpoint$param'), headers: requestHeaders);
+      log('$baseUrl$endpoint$param');
 
       if(response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;

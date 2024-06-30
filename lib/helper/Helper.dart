@@ -16,7 +16,7 @@ class Helper {
   static Widget badge({String text = '', String type = 'success'}) {
     Color bgColor = Colors.green;
     if(type == 'warning') {
-      bgColor = Color.fromRGBO(255, 170, 5, 1);
+      bgColor = const Color.fromRGBO(255, 170, 5, 1);
     }
     else if(type == 'error'){
       bgColor = Colors.red;
@@ -37,7 +37,7 @@ class Helper {
   static Widget button(String text, {required Function() callback, String type = 'success', IconData? icon,}) {
     Color bgColor = Colors.green;
     if (type == 'warning') {
-      bgColor = Color.fromRGBO(255, 170, 5, 1);
+      bgColor = const Color.fromRGBO(255, 170, 5, 1);
     } else if (type == 'error') {
       bgColor = Colors.red;
     } else if (type == 'info') {
@@ -58,7 +58,7 @@ class Helper {
       onPressed: callback,
       style: ElevatedButton.styleFrom(
         backgroundColor: bgColor,
-        padding: EdgeInsets.all(0),
+        padding: const EdgeInsets.all(0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -81,9 +81,15 @@ class Helper {
     return Container(
       color: Colors.white,
       child: Center(
-        child: Image.asset(
-          'assets/images/no-data.png', // Update this URL to the exact image URL if needed
-          fit: BoxFit.cover,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/images/no-data.png', // Update this URL to the exact image URL if needed
+              fit: BoxFit.cover,
+            ),
+            const Text('Data Kosong')
+          ],
         ),
       ),
     );
@@ -95,12 +101,12 @@ class Helper {
         behavior: SnackBarBehavior.floating,
         content: Row(
           children: [
-            Icon(Icons.check_circle),
-            SizedBox(width: 10),
+            const Icon(Icons.check_circle),
+            const SizedBox(width: 10),
             Text(message),
           ],
         ),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }

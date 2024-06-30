@@ -21,6 +21,7 @@ class PengaduanItem extends StatelessWidget {
   final String lokasi;
   final String visibilitas;
   final String statusPublish;
+  final bool showManipButton;
 
   const PengaduanItem({
     Key? key,
@@ -37,6 +38,7 @@ class PengaduanItem extends StatelessWidget {
     required this.lokasi,
     required this.visibilitas,
     required this.statusPublish,
+    required this.showManipButton,
   });
 
   void _openDetails(BuildContext context, String idPengaduan) {
@@ -303,14 +305,14 @@ class PengaduanItem extends StatelessWidget {
                         callback: () => _openDetails(context, id),
                         icon: FontAwesomeIcons.eye,
                         type: 'info')),
-                if (statusId == '1')
+                if (statusId == '1' && showManipButton)
                   Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: Helper.button("Edit ",
                           callback: () => _openEdit(context, id),
                           icon: FontAwesomeIcons.pencil,
                           type: 'info')),
-                if (statusId == '1')
+                if (statusId == '1' && showManipButton)
                   Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
                       child: Helper.button("Hapus ",

@@ -19,7 +19,7 @@ class Pengaduan extends StatefulWidget {
 }
 
 class _PengaduanState extends State<Pengaduan> {
-  bool _isMypengaduan = false; ///filter only pengaduan made by current user
+  bool _showPublicPengaduan = false; ///filter only pengaduan made by current user
   bool _isMyRthPengaduan = false; ///filter only pengaduan made by current user
   List<Map<String, bool>> _kategoriFilters = []; ///hold filtered kategori
   List<Map<String, bool>> _status = []; ///hold filtered status pengaduan
@@ -40,12 +40,13 @@ class _PengaduanState extends State<Pengaduan> {
       appState.setFilterCallback(() {
         _showFilter(context);
       });
-
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final AppState appState = Provider.of<AppState>(context, listen: false);
+    final Map<String, dynamic> userdata = appState.userData;
     return FutureBuilder(
       future: _futures,
       builder: (context, snapshot) {
@@ -60,18 +61,26 @@ class _PengaduanState extends State<Pengaduan> {
             Navigator.push(context, MaterialPageRoute(builder: (context) => LoginView()));
           }
           final result = snapshot.data['data'];
+          if(result.isEmpty) {
+            return Helper.empty();
+          }
           final parsedData = List<Map<String, dynamic>>.from(result);
+
           List<Widget> listItem = [];
 
           for (var dataList in parsedData) {
             var data = dataList;
             String statusColor = 'info';
+            bool showManipButton = false;
 
             if(data['id_status_pengaduan'] == '2'){
               statusColor = 'warning';
             }
             else if(data['id_status_pengaduan'] == '3') {
               statusColor = 'success';
+            }
+            if(userdata['id_user'] == data['id_user']) {
+              showManipButton =true;
             }
 
             Widget item = PengaduanItem(
@@ -88,6 +97,7 @@ class _PengaduanState extends State<Pengaduan> {
               visibilitas: data['visibilitas'],
               rth: data['nama_rth'] ?? '',
               statusPublish: data['status_publish'],
+              showManipButton: showManipButton
             );
             listItem.add(item);
           }
@@ -115,6 +125,50 @@ class _PengaduanState extends State<Pengaduan> {
                     Expanded(
                       child: ListView(
                         children: [
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Tipe : ',
+                                style: TextStyle(
+                                  color: CustomTheme.textPrimaryColor,
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _showPublicPengaduan = _showPublicPengaduan ? false : true;
+                              });
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Checkbox(
+                                      value: _showPublicPengaduan,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          _showPublicPengaduan = value ?? true;
+                                        });
+                                      },
+                                    ),
+                                    const Text(
+                                      'tampilkan pengaduan publik',
+                                      style: TextStyle(
+                                        color: CustomTheme.textSecondaryColor,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
                           const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -211,10 +265,15 @@ class _PengaduanState extends State<Pengaduan> {
       if(jenisFilter.isNotEmpty) and = '&';
       statusFilter = '${and}id_status=${statusFilter}';
     }
-    String filter = '?$jenisFilter$statusFilter';
+    String filter = '$jenisFilter$statusFilter';
 
-    log(filter);
+    if(_showPublicPengaduan) {
+      filter +='&showPublic=true';
+    }
 
+    setState(() {
+      _futures = DataFetch.get(endpoint: 'Pengaduan',param: filter);
+    });
   }
 
   Widget _filterWidget({required Future<dynamic> future, required String key, required StateSetter setState,required String name, required Map<String, bool> valueHolder}) {

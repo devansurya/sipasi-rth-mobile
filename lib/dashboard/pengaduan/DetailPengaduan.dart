@@ -103,7 +103,7 @@ class _DetailPengaduanState extends State<DetailPengaduan> {
               ),
               const SizedBox(height: 8.0),
               Text(
-                data['nama_rth'],
+                data['nama_rth'] ?? '',
                 style: const TextStyle(
                   fontSize: 16.0,
                   color: CustomTheme.textPrimaryColor,
@@ -120,7 +120,7 @@ class _DetailPengaduanState extends State<DetailPengaduan> {
               const SizedBox(height: 8.0),
               Text(
                 data['lokasi'],
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16.0,
                   color: CustomTheme.textPrimaryColor,
                 ),
