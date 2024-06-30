@@ -429,9 +429,15 @@ class DataFetch {
         request.fields['nama'] = nama;
         request.fields['no_telp'] = noTelp;
         request.fields['id_role'] = idRole;
+        request.fields['kelurahan'] = '';
+        request.fields['kecamatan'] = '';
+        request.fields['alamat'] = '';
+        request.fields['foto_profile'] = '';
 
         var response = await request.send();
         var responseBody = await http.Response.fromStream(response);
+        log(responseBody.body);
+
 
         if (response.statusCode == 200) {
           final data = jsonDecode(responseBody.body) as Map<String, dynamic>;

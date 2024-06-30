@@ -43,11 +43,7 @@ class RegisterLayout extends State<RegisterView> {
       );
 
       if (response != null && response['code'] == 200) {
-        Fluttertoast.showToast(
-          msg: 'Registration successful!',
-          backgroundColor: Colors.grey,
-        );
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       } else {
         Fluttertoast.showToast(
           msg: 'Registration failed. Please try again.',
@@ -117,6 +113,7 @@ class RegisterLayout extends State<RegisterView> {
                         child: TextFormField(
                           decoration: const InputDecoration(labelText: 'No Telepon', fillColor: Colors.white),
                           controller: phoneController,
+                          keyboardType: TextInputType.phone,
                         ),
                       ),
                       Padding(

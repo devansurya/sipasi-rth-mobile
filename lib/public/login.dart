@@ -7,6 +7,7 @@ import 'package:sipasi_rth_mobile/dashboard/Index.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../api/data.dart';
 import '../app_state.dart';
+import '../helper/Helper.dart';
 import 'registrasi.dart'; // Pastikan Anda memiliki halaman register yang sesuai
 
 
@@ -111,18 +112,15 @@ class LoginLayout extends State<LoginView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween, // This will space the widgets evenly
                           children: [
                             TextButton(
-                                onPressed: () {
-                                  // Navigate to forget password page
-                                },
-                                child: const Text('Forget Password')
-                            ),
-                            TextButton(
-                                onPressed: () {
+                                onPressed: () async {
                                   // Navigate to the registration page
-                                  Navigator.push(
+                                  var data = await Navigator.push(
                                     context,
                                     MaterialPageRoute(builder: (context) => const RegisterView()),
                                   );
+                                  if(data) {
+                                    Helper.showSuccessSnackbar(context, 'Silahkan Login');
+                                  }
                                 },
                                 child: const Text('Register')
                             ),
