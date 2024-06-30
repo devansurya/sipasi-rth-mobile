@@ -119,15 +119,70 @@ class DataFetch {
     return false;
   }
 
+  static Future<Map<String, String>> getUrls() async {
+
+    String baseUrl = await getBaseUrl();
+    String assetsUrl = await getAssetsUrl();
+
+    log( {
+      'baseUrl' : baseUrl,
+      'assetsUrl' : assetsUrl
+    }.toString());
+
+    return {
+      'baseUrl' : baseUrl,
+      'assetsUrl' : assetsUrl
+    };
+  }
+
   static Future<String> getBaseUrl() async {
     await dotenv.load(fileName: ".env");
 
-    return dotenv.get("API_URL") ?? 'http://192.168.1.6/sipasi-rth/api/';
+    String baseUrlDatabase =  await DB.instance.getSetting('baseUrl') ?? '';
+    if(baseUrlDatabase.isEmpty) {
+      // baseUrlDatabase = dotenv.get("API_URL");
+    }
+    log(baseUrlDatabase);
+    return baseUrlDatabase ?? 'http://192.168.1.6/sipasi-rth/api/';
   }
   static Future<String> getAssetsUrl() async {
     await dotenv.load(fileName: ".env");
+    String baseUrlDatabase =  await DB.instance.getSetting('assetsUrl') ?? '';
+    if(baseUrlDatabase.isEmpty) {
+      baseUrlDatabase = dotenv.get("ASSETS_URL");
+    }
+    log(baseUrlDatabase);
+    return baseUrlDatabase ?? 'http://192.168.1.206/sipasi-rth/';
+  }
 
-    return dotenv.get("ASSETS_URL") ?? 'http://192.168.1.206/sipasi-rth/';
+  static Future<bool> updateBaseUrl(String url) async {
+    final String now =DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+
+    var baseUrl = Setting(
+        code: 'baseUrl',
+        value: url, // Assuming token is a String
+        desc: 'Base Url',
+        createDate: now
+    );
+    //updates the token in the local db
+    await DB.instance.insertSetting(baseUrl);
+
+    return true;
+  }
+  static Future<bool> updateAssetsUrl(String url) async {
+    final String now =DateFormat("yyyy-MM-dd HH:mm:ss").format(DateTime.now());
+
+    var assetsUrl = Setting(
+        code: 'assetsUrl',
+        value: url, // Assuming token is a String
+        desc: 'Base Url',
+        createDate: now
+    );
+
+    //updates the token in the local db
+    await DB.instance.insertSetting(assetsUrl);
+
+    return true;
   }
 
   static Future<dynamic> sendData({required Map<String, dynamic> formData, required String endpoint, File? file, String method = 'POST'}) async {

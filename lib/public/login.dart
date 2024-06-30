@@ -22,28 +22,69 @@ class LoginLayout extends State<LoginView> {
   final bool _passwordVisible = false;
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passController = TextEditingController();
+  final TextEditingController urlController = TextEditingController();
+  final TextEditingController assetsUrlController = TextEditingController();
+  late Future<dynamic> _getbaseUrl;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _getbaseUrl = DataFetch.getUrls();
+  }
 
   void openDialog(BuildContext context) {
     showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Setting'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Row(
-              mainAxisSize: MainAxisSize.max,
-            )
-          ],
-        ),
-        actions: <Widget>[
-          TextButton(
-            //child: const Text('OK'),
-            child: const Text('Save'),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
-      ),
+      builder: (context) => FutureBuilder(future: _getbaseUrl, builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Helper.circleIndicator();
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data.isEmpty) {
+          return const Center(child: Text('No data available'));
+        } else {
+          var data =snapshot.data;
+          log(data.toString());
+          urlController.text = data['baseUrl'] ?? '';
+          assetsUrlController.text = data['assetsUrl'] ?? '';
+
+          return AlertDialog(
+            title: const Text('Setting'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Column(
+                  children: [
+                    const Text('Url Api : '),
+                    Row(children: [Expanded(child: TextField(keyboardType: TextInputType.url,controller: urlController))]),
+                    const Text('Url Assets : '),
+                    Row(children: [Expanded(child: TextField(keyboardType: TextInputType.url,controller: assetsUrlController))])
+                  ],
+                )
+              ],
+            ),
+            actions: <Widget>[
+              TextButton(
+                //child: const Text('OK'),
+                child: const Text('Save'),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+              Helper.button('Save', callback: () async {
+                var data = await DataFetch.updateBaseUrl(urlController.text);
+                var data2 = await DataFetch.updateAssetsUrl(assetsUrlController.text);
+                if(data && data2) {
+                  Navigator.pop(context);
+                  setState(() {
+                    _getbaseUrl = DataFetch.getUrls();
+                  });
+                  Helper.showSuccessSnackbar(context, 'Success Update url');
+                }
+              })
+            ],
+          );
+        }
+      }),
     );
   }
 
