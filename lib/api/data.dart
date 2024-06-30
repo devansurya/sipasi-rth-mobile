@@ -410,5 +410,39 @@ class DataFetch {
       'status' : dataStatus,
     };
   }
+
+
+  Future<Map<String, dynamic>?> register({
+    required String email,
+    required String password,
+    required String nama,
+    required String noTelp,
+    required String idRole,
+    }) async {
+      try {
+        String baseUrl = await getBaseUrl();
+
+        var request = http.MultipartRequest('POST', Uri.parse('${baseUrl}user/post'));
+
+        request.fields['email'] = email;
+        request.fields['password'] = password;
+        request.fields['nama'] = nama;
+        request.fields['no_telp'] = noTelp;
+        request.fields['id_role'] = idRole;
+
+        var response = await request.send();
+        var responseBody = await http.Response.fromStream(response);
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(responseBody.body) as Map<String, dynamic>;
+          return data;
+        } else {
+          throw Exception('Registration Failed: ' + jsonDecode(responseBody.body)['error']);
+        }
+      } catch (error) {
+        log(error.toString());
+        throw Exception(error);
+      }
+  }
 }
 
