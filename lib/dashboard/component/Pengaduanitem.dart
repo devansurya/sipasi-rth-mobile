@@ -22,6 +22,7 @@ class PengaduanItem extends StatelessWidget {
   final String visibilitas;
   final String statusPublish;
   final bool showManipButton;
+  final Function refresh;
 
   const PengaduanItem({
     Key? key,
@@ -39,20 +40,29 @@ class PengaduanItem extends StatelessWidget {
     required this.visibilitas,
     required this.statusPublish,
     required this.showManipButton,
+    required this.refresh,
   });
 
-  void _openDetails(BuildContext context, String idPengaduan) {
-    Navigator.push(
+  void _openDetails(BuildContext context, String idPengaduan)async {
+    var data = await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => DetailPengaduan(idPengaduan: idPengaduan)));
+    if(data) {
+      Helper.showSuccessSnackbar(context, 'Success');
+      refresh();
+    }
   }
 
-  void _openEdit(BuildContext context, String idPengaduan) {
-    Navigator.push(
+  void _openEdit(BuildContext context, String idPengaduan) async {
+    var data = await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => FormPengaduan(idPengaduan: idPengaduan)));
+    if(data) {
+      Helper.showSuccessSnackbar(context, 'Success');
+      refresh();
+    }
   }
 
   void _openDeleteConfirmation(BuildContext context, String idPengaduan) {

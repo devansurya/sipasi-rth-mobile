@@ -97,7 +97,8 @@ class _PengaduanState extends State<Pengaduan> {
               visibilitas: data['visibilitas'],
               rth: data['nama_rth'] ?? '',
               statusPublish: data['status_publish'],
-              showManipButton: showManipButton
+              showManipButton: showManipButton,
+              refresh :() {_getData();}
             );
             listItem.add(item);
           }
@@ -109,6 +110,9 @@ class _PengaduanState extends State<Pengaduan> {
   }
 
   void _showFilter(BuildContext context) {
+    final AppState appState = Provider.of<AppState>(context, listen: false);
+    final Map<String, dynamic> userdata = appState.userData;
+    log(userdata.toString());
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -125,7 +129,7 @@ class _PengaduanState extends State<Pengaduan> {
                     Expanded(
                       child: ListView(
                         children: [
-                          const Row(
+                          if(userdata['id_role'] != '1') const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text(
@@ -138,7 +142,7 @@ class _PengaduanState extends State<Pengaduan> {
                               ),
                             ],
                           ),
-                          GestureDetector(
+                          if(userdata['id_role'] != '1')  GestureDetector(
                             onTap: () {
                               setState(() {
                                 _showPublicPengaduan = _showPublicPengaduan ? false : true;
