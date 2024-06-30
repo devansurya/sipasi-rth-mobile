@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:sipasi_rth_mobile/dashboard/Index.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../api/data.dart';
-
+import 'registrasi.dart'; // Pastikan Anda memiliki halaman register yang sesuai
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -20,7 +20,6 @@ class LoginLayout extends State<LoginView> {
   final TextEditingController passController = TextEditingController();
 
   void openDialog(BuildContext context) {
-
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -76,45 +75,63 @@ class LoginLayout extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(234, 234, 234, 1.0),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Card(
-                color: Colors.white,
-                child: Column(
-                  children: <Widget>[
-                    Padding(padding: const EdgeInsets.all(20.0), child: Image.asset('assets/icons/logo.png')),
-                    Padding(padding: const EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Email',fillColor: Colors.white),controller: emailController,),),
-                    Padding(padding: const EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Password',fillColor: Colors.white), obscureText: true,controller: passController,),),
-                    Padding(padding: const EdgeInsets.all(20.0), child: ConstrainedBox(
-                      constraints: const BoxConstraints.tightFor(width: double.infinity),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          checkLogin(context);
-                        },
-                        child: const Text('Login'),
+        backgroundColor: const Color.fromRGBO(234, 234, 234, 1.0),
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Card(
+                  color: Colors.white,
+                  child: Column(
+                    children: <Widget>[
+                      Padding(padding: const EdgeInsets.all(20.0), child: Image.asset('assets/icons/logo.png')),
+                      Padding(padding: const EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Email',fillColor: Colors.white),controller: emailController,),),
+                      Padding(padding: const EdgeInsets.all(20.0), child: TextFormField(decoration: const InputDecoration(labelText: 'Password',fillColor: Colors.white), obscureText: true,controller: passController,),),
+                      Padding(padding: const EdgeInsets.all(20.0), child: ConstrainedBox(
+                        constraints: const BoxConstraints.tightFor(width: double.infinity),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            checkLogin(context);
+                          },
+                          child: const Text('Login'),
+                        ),
                       ),
-                    ),
-                    ),
-                    const Padding(padding: EdgeInsets.all(20.0), child: Row(
-                      children: [
-                        TextButton(onPressed: null, child: Text('Forget Password'))
-                      ],
-                    )),
-                  ],
-                ),
-              )
-            ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween, // This will space the widgets evenly
+                          children: [
+                            TextButton(
+                                onPressed: () {
+                                  // Navigate to forget password page
+                                },
+                                child: const Text('Forget Password')
+                            ),
+                            TextButton(
+                                onPressed: () {
+                                  // Navigate to the registration page
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const RegisterView()),
+                                  );
+                                },
+                                child: const Text('Register')
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
-      ),
-      floatingActionButton:  FloatingActionButton(onPressed:() =>  openDialog(context),mini: true,backgroundColor: Colors.white,enableFeedback: true, child: const Icon(Icons.settings,color: Colors.green,)),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endTop
+        floatingActionButton:  FloatingActionButton(onPressed:() =>  openDialog(context),mini: true,backgroundColor: Colors.white,enableFeedback: true, child: const Icon(Icons.settings,color: Colors.green,)),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endTop
     );
   }
 }
-
