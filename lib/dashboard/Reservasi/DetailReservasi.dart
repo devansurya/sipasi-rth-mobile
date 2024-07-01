@@ -227,7 +227,7 @@ class DetailReservasi extends StatelessWidget {
                                   style: _primaryText,
                                   textAlign: TextAlign.left)),
                           Expanded(
-                              child: Text(data['nama_fasilitas'],
+                              child: Text(data['nama_fasilitas'] ?? '',
                                   style: _secondaryText,
                                   textAlign: TextAlign.left)),
                         ],
@@ -238,7 +238,7 @@ class DetailReservasi extends StatelessWidget {
                       child:  ClipRRect(
                         borderRadius: const BorderRadius.all(Radius.circular(10.0)),
                         child: ImageApi(
-                          Url: data['foto_fasilitas'],
+                          Url: data['foto_fasilitas'] ?? '',
                           defaultImage: "assets/images/default-card.jpg",
                           useBaseUrl: true,
                         ),
@@ -373,9 +373,9 @@ class DetailReservasi extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  if(data['id_status_reservasi'] != '3') Helper.button('Tolak', type: 'error', callback: (){}),
+                  if(data['id_status_reservasi'] != '3') Helper.button('Tolak', type: 'error', callback: (){_updateStatus(context, idReservasi, '3');}),
                   const SizedBox(width: 5,),
-                  if(data['id_status_reservasi'] != '2') Helper.button('Setujui', callback: (){}),
+                  if(data['id_status_reservasi'] != '2') Helper.button('Setujui', callback: (){_updateStatus(context, idReservasi, '2');}),
                 ],
               ),
             )
@@ -384,4 +384,16 @@ class DetailReservasi extends StatelessWidget {
       );
     }
   }
+
+  void _updateStatus(context, id_pengaduan, id_status) async {
+    Map<String,dynamic> formData = {
+      'id_reservasi' : id_pengaduan,
+      'id_status_reservasi' : id_status,
+      'type' : (id_status == '2') ? 'setujui' : 'tolak'
+    };
+    var data = await DataFetch.sendData(formData: formData, endpoint: 'reservasi', method: 'PATCH');
+
+    Navigator.pop(context, true);
+  }
+
 }

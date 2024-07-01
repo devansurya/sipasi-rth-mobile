@@ -140,7 +140,7 @@ class DataFetch {
 
     String baseUrlDatabase =  await DB.instance.getSetting('baseUrl') ?? '';
     if(baseUrlDatabase.isEmpty) {
-      // baseUrlDatabase = dotenv.get("API_URL");
+      baseUrlDatabase = dotenv.get("API_URL");
     }
     log(baseUrlDatabase);
     return baseUrlDatabase ?? 'http://192.168.1.6/sipasi-rth/api/';
@@ -193,6 +193,7 @@ class DataFetch {
     var request = http.MultipartRequest(method, Uri.parse('$baseUrl$endpoint'));
     request.headers['Authorization'] = 'Bearer $token';
 
+    log(formData.toString());
     formData.forEach((key, value) {
       request.fields[key] = value.toString(); // Convert all values to String
     });
